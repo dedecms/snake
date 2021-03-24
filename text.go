@@ -30,6 +30,8 @@ type String interface {
 	Lines() []string                  // 将行转为数组
 	Find(dst string) bool             // 查找文字都是存在
 	Split(sep string) []string        // 通过特定字符分割Text
+	SplitPlace(sep []int) []string    // 根据字符串的位置进行分割
+	SplitInt(sep int) []string        // 根据字数进行分割
 	Get() string                      // 输出Text
 }
 
@@ -201,10 +203,53 @@ func (t *snaketext) Split(sep string) []string {
 	return strings.Split(t.Input, sep)
 }
 
+// SplitPlace 根据字符串的位置进行分割
+// Text("abcdefg").SpltPlace([]int{1,3,4})
+// Out: []string{"a", "bc", "d", "efg"}
+func (t *snaketext) SplitPlace(sep []int) []string {
+	var a []string
+	b := Text()
+	for k, v := range []rune(t.Input) {
+		b.Add(string(v))
+		for _, i := range sep {
+			if i == k+1 {
+				a = append(a, b.Get())
+				b = Text()
+			}
+		}
+
+		if len(t.Input) == k+1 {
+			a = append(a, b.Get())
+		}
+	}
+	return a
+}
+
+// SplitInt 根据字符串的位置进行分割
+// Text("abcdefg").SpltPlace([]int{1,3,4})
+// Out: []string{"a", "bc", "d", "efg"}
+func (t *snaketext) SplitInt(sep int) []string {
+	var a []string
+	b := Text()
+	i := 0
+	for _, v := range []rune(t.Get()) {
+		b.Add(string(v))
+
+		i = i + len(string(v))
+
+		bl := len(b.Get())
+
+		if bl >= sep || i == len(t.Get()) {
+			a = append(a, b.Get())
+			b = Text()
+		}
+	}
+
+	return a
+}
+
 // Lines 根据行进行分割字符 ...
 func (t *snaketext) Lines() []string {
-	// matchWord := regexp.MustCompile(`^(\s*)\n`)
-	// result := matchWord.ReplaceAllString(t.Input, "")
 	return strings.Split(strings.TrimSuffix(t.Input, "\n"), "\n")
 }
 
