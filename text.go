@@ -85,13 +85,19 @@ func (t *snaketext) IsMatch(dst string) bool {
 
 // Remove 删除字符串 ...
 func (t *snaketext) Remove(dst string) String {
-	temp := t
+
+	temp := Text(t.Get())
+
 	if temp.IsMatch(dst) == true {
-		for _, v := range temp.Input {
+		for _, v := range temp.Get() {
 			if nt := Text(string(v)); nt.IsMatch(dst) == true {
 				temp.Replace(string(v), "")
 			}
 		}
+	}
+
+	if temp.IsMatch(dst) == false {
+		return temp
 	}
 
 	return t
