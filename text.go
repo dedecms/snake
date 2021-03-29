@@ -88,25 +88,14 @@ func (t *snaketext) Remove(dst string) String {
 
 	temp := Text(t.Get())
 
-	// if temp.IsMatch(dst) == true {
-	// 	for _, v := range temp.Get() {
-	// 		if nt := Text(string(v)); nt.IsMatch(dst) == true {
-	// 			temp.Replace(string(v), "")
-	// 		}
-	// 	}
-	// }
-
-	if temp.IsMatch(dst) == true {
-		data := regexp.MustCompile(dst).FindAll([]byte(temp.Get()), -1)
-		for _, v := range data {
-			if temp.IsMatch(dst) == true {
-				temp.Replace(string(v), "")
-			}
+	data := regexp.MustCompile(dst).FindAll([]byte(temp.Get()), -1)
+	for _, v := range data {
+		if temp.IsMatch(dst) == true {
+			temp.Replace(string(v), "")
 		}
-		return temp
 	}
 
-	return t
+	return temp
 }
 
 // Keep 保留字符串 ...
