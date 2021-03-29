@@ -78,7 +78,7 @@ func (t *snaketext) Replace(src, dst string) String {
 
 // Find 判断字符串或符合正则规则的字符串是否存在 ...
 func (t *snaketext) Find(dst string) bool {
-	if d := regexp.MustCompile(dst).FindAll([]byte(t.Get()), -1); len(d) > 0 {
+	if d := regexp.MustCompile(dst).FindAll([]byte(t.Input), -1); len(d) > 0 {
 		return true
 	}
 	return false
