@@ -5,6 +5,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"golang.org/x/text/width"
 )
 
 type snaketext struct {
@@ -15,6 +17,8 @@ type snaketext struct {
 type String interface {
 	Add(str ...string) String         // 在当前Text后追加字符
 	Replace(src, dst string) String   // 字符替换
+	Widen() String                    // 半角字符转全角字符
+	Narrow() String                   // 全角字符转半角字符
 	Remove(dst string) String         // 删除字符串
 	ReComment() String                // 去除注解
 	Between(start, end string) String // 取A字符与B字符之间的字符
@@ -72,6 +76,18 @@ func (t *snaketext) Replace(src, dst string) String {
 // Remove 删除字符串 ...
 func (t *snaketext) Remove(dst string) String {
 	t.Input = strings.Replace(t.Input, dst, "", -1)
+	return t
+}
+
+// Narrow 全角字符转半角字符 ...
+func (t *snaketext) Narrow() String {
+	t.Input = width.Narrow.String(t.Input)
+	return t
+}
+
+// Widen 半角字符转全角字符 ...
+func (t *snaketext) Widen() String {
+	t.Input = width.Narrow.String(t.Input)
 	return t
 }
 
