@@ -2,7 +2,6 @@ package snake
 
 import (
 	"bytes"
-	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -100,11 +99,12 @@ func (t *snaketext) Keep(dst string) String {
 	if t.Find(dst) == true {
 		p := Text()
 		d := regexp.MustCompile(dst).FindAll([]byte(t.Get()), -1)
-		fmt.Println(d)
+
 		for _, v := range d {
 			p.Add(string(v))
 		}
-		return p
+
+		t.Input = p.Get()
 	}
 
 	return t
