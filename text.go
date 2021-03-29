@@ -16,12 +16,12 @@ type snaketext struct {
 // String ...
 type String interface {
 	Add(str ...string) String         // 在当前Text后追加字符
-	IsMatch(dst string) bool          // 判断字符串是否存在
+	IsMatch(dst string) bool          // 判断字符串或符合正则规则的字符串是否存在
 	Replace(src, dst string) String   // 字符替换
-	Keep(dst string) String           // 根据正则规则保留字符串 ...
+	Remove(dst string) String         // 删除符合正则规则的字符串或指定字符串
+	Keep(dst string) String           // 保留符合正则规则的字符串或指定字符串
 	Widen() String                    // 半角字符转全角字符
 	Narrow() String                   // 全角字符转半角字符
-	Remove(dst string) String         // 删除字符串
 	ReComment() String                // 去除注解
 	Between(start, end string) String // 取A字符与B字符之间的字符
 	Trim(sep string) String           // 去除首尾的特定字符
@@ -75,7 +75,7 @@ func (t *snaketext) Replace(src, dst string) String {
 	return t
 }
 
-// IsMatch 判断字符串是否存在 ...
+// IsMatch 判断字符串或符合正则规则的字符串是否存在 ...
 func (t *snaketext) IsMatch(dst string) bool {
 	if ok, err := regexp.MatchString(dst, t.Input); ok && err == nil {
 		return true
@@ -83,7 +83,7 @@ func (t *snaketext) IsMatch(dst string) bool {
 	return false
 }
 
-// Remove 删除字符串 ...
+// Remove 根据正则规则删除字符串 ...
 func (t *snaketext) Remove(dst string) String {
 
 	d := regexp.MustCompile(dst).FindAll([]byte(t.Get()), -1)
@@ -96,7 +96,7 @@ func (t *snaketext) Remove(dst string) String {
 	return t
 }
 
-// Keep 保留字符串 ...
+// Keep 根据正则规则保留字符串 ...
 func (t *snaketext) Keep(dst string) String {
 
 	if t.IsMatch(dst) == true {
