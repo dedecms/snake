@@ -15,6 +15,7 @@ type snaketext struct {
 type String interface {
 	Add(str ...string) String         // 在当前Text后追加字符
 	Replace(src, dst string) String   // 字符替换
+	Remove(dst string) String         // 删除字符串
 	ReComment() String                // 去除注解
 	Between(start, end string) String // 取A字符与B字符之间的字符
 	Trim(sep string) String           // 去除首尾的特定字符
@@ -62,9 +63,15 @@ func (t *snaketext) Add(str ...string) String {
 // ---------------------------------------
 // 处理 :
 
-// Replace 字符替换...
+// Replace 字符替换 ...
 func (t *snaketext) Replace(src, dst string) String {
 	t.Input = strings.Replace(t.Input, src, dst, -1)
+	return t
+}
+
+// Remove 删除字符串 ...
+func (t *snaketext) Remove(dst string) String {
+	t.Input = strings.Replace(t.Input, dst, "", -1)
 	return t
 }
 
