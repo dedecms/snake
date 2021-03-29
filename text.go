@@ -18,7 +18,7 @@ type String interface {
 	Add(str ...string) String         // 在当前Text后追加字符
 	Find(dst string) bool             // 判断字符串或符合正则规则的字符串是否存在
 	Replace(src, dst string) String   // 字符替换
-	Remove(dst string) String         // 删除符合正则规则的字符串或指定字符串
+	Remove(dst ...string) String      // 删除符合正则规则的字符串或指定字符串
 	Keep(dst string) String           // 保留符合正则规则的字符串或指定字符串
 	Widen() String                    // 半角字符转全角字符
 	Narrow() String                   // 全角字符转半角字符
@@ -83,8 +83,13 @@ func (t *snaketext) Find(dst string) bool {
 }
 
 // Remove 根据正则规则删除字符串 ...
-func (t *snaketext) Remove(dst string) String {
-	t.Input = regexp.MustCompile(dst).ReplaceAllString(t.Input, "")
+func (t *snaketext) Remove(dst ...string) String {
+	if len(dst) > 0 {
+		for _, v := range dst {
+			t.Input = regexp.MustCompile(v).ReplaceAllString(t.Input, "")
+		}
+	}
+
 	return t
 }
 
@@ -117,9 +122,10 @@ func (t *snaketext) Widen() String {
 
 // ReComment 去除代码注解...
 func (t *snaketext) ReComment() String {
-	t.Remove(`\/\/.*`).
-		Remove(`\/\*(\s|.)*?\*\/`).
-		Remove(`(?m)^\s*$[\r\n]*|[\r\n]+\s+\z`)
+	t.Remove(
+		`\/\/.*`,
+		`\/\*(\s|.)*?\*\/`,
+		`(?m)^\s*$[\r\n]*|[\r\n]+\s+\z`)
 	return t
 }
 
