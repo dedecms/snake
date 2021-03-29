@@ -69,7 +69,11 @@ func (t *snaketext) Add(str ...string) String {
 // ---------------------------------------
 // 处理 :
 
-// Replace 字符替换 ...
+// Replace 替换字符串或符合正则规则的字符串 ...
+// snake.Text("http://www.dedecms.com").Replace("(http://).*(dedecms.com)", "${1}${2}")
+// out: http://dedecms.com
+// snake.Text("http://www.example.com").Replace("example", "dedecms")
+// out: http://www.dedecms.com
 func (t *snaketext) Replace(src, dst string) String {
 	fmt.Println(t.Find(src))
 	t.Input = regexp.MustCompile(src).ReplaceAllString(t.Input, dst)
