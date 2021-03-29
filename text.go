@@ -2,6 +2,7 @@ package snake
 
 import (
 	"bytes"
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -95,6 +96,7 @@ func (t *snaketext) Remove(dst string) String {
 			}
 		}
 	}
+	fmt.Println(temp.IsMatch(dst))
 
 	if temp.IsMatch(dst) == false {
 		return temp
