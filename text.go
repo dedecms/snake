@@ -2,7 +2,6 @@ package snake
 
 import (
 	"bytes"
-	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -89,22 +88,18 @@ func (t *snaketext) Remove(dst string) String {
 
 	temp := Text(t.Get())
 
-	if temp.IsMatch(dst) == true {
-		for _, v := range temp.Get() {
-			if nt := Text(string(v)); nt.IsMatch(dst) == true {
-				temp.Replace(string(v), "")
-			}
-		}
-	}
-
-	fmt.Println(temp.IsMatch(dst))
+	// if temp.IsMatch(dst) == true {
+	// 	for _, v := range temp.Get() {
+	// 		if nt := Text(string(v)); nt.IsMatch(dst) == true {
+	// 			temp.Replace(string(v), "")
+	// 		}
+	// 	}
+	// }
 
 	if temp.IsMatch(dst) == true {
-		reg := regexp.MustCompile(dst)
-
-		data := reg.FindAll([]byte(temp.Get()), -1)
+		data := regexp.MustCompile(dst).FindAll([]byte(temp.Get()), -1)
 		for _, v := range data {
-			fmt.Println(string(v))
+			temp.Replace(string(v), "")
 		}
 		return temp
 	}
