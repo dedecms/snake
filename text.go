@@ -20,7 +20,7 @@ type String interface {
 	Find(dst string) bool             // 判断字符串或符合正则规则的字符串是否存在
 	Keep(dst string) String           // 保留符合正则规则的字符串或指定字符串
 	Remove(dst ...string) String      // 删除符合正则规则的字符串或指定字符串
-	Replace(src, dst string) String   // 字符替换
+	Replace(src, dst string) String   // 替换字符串或符合正则规则的字符串
 	Widen() String                    // 半角字符转全角字符
 	Narrow() String                   // 全角字符转半角字符
 	ReComment() String                // 去除注解
@@ -74,6 +74,8 @@ func (t *snaketext) Add(str ...string) String {
 // out: http://dedecms.com
 // snake.Text("http://www.example.com").Replace("example", "dedecms")
 // out: http://www.dedecms.com
+// 如需替换$等字符，请使用\\$
+// snake.Text("http://$1example.com").Replace("\\$1.*(.com)", "www.dedecms${1}")
 func (t *snaketext) Replace(src, dst string) String {
 	fmt.Println(t.Find(src))
 	t.Input = regexp.MustCompile(src).ReplaceAllString(t.Input, dst)
