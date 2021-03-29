@@ -96,9 +96,14 @@ func (t *snaketext) Remove(dst string) String {
 			}
 		}
 	}
+
 	fmt.Println(temp.IsMatch(dst))
 
-	if temp.IsMatch(dst) == false {
+	if temp.IsMatch(dst) == true {
+		reg := regexp.MustCompile(dst)
+
+		data := reg.Find([]byte(temp.Get()))
+		fmt.Println(string(data))
 		return temp
 	}
 
