@@ -16,6 +16,7 @@ type snaketext struct {
 // String ...
 type String interface {
 	Add(str ...string) String         // 在当前Text后追加字符
+	IsMatch(dst string) bool          // 判断字符串是否存在
 	Replace(src, dst string) String   // 字符替换
 	Keep(dst string) String           // 根据正则规则保留字符串 ...
 	Widen() String                    // 半角字符转全角字符
@@ -74,13 +75,21 @@ func (t *snaketext) Replace(src, dst string) String {
 	return t
 }
 
+// IsMatch 判断字符串是否存在 ...
+func (t *snaketext) IsMatch(dst string) bool {
+	if ok, err := regexp.MatchString(dst, t.Input); ok && err == nil {
+		return true
+	}
+	return false
+}
+
 // Remove 删除字符串 ...
 func (t *snaketext) Remove(dst string) String {
-
-	if ok, err := regexp.MatchString(dst, t.Input); ok && err == nil {
-		for _, v := range t.Input {
-			if ok, err := regexp.MatchString(dst, string(v)); ok && err == nil {
-				t.Input = strings.Replace(t.Input, string(v), "", -1)
+	temp := t
+	if temp.IsMatch(dst) == true {
+		for _, v := range temp.Input {
+			if nt := Text(string(v)); nt.IsMatch(dst) == true {
+				temp.Replace(string(v), "")
 			}
 		}
 	}
