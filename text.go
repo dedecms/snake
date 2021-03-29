@@ -16,7 +16,7 @@ type snaketext struct {
 // String ...
 type String interface {
 	Add(str ...string) String         // 在当前Text后追加字符
-	IsMatch(dst string) bool          // 判断字符串或符合正则规则的字符串是否存在
+	Find(dst string) bool             // 判断字符串或符合正则规则的字符串是否存在
 	Replace(src, dst string) String   // 字符替换
 	Remove(dst string) String         // 删除符合正则规则的字符串或指定字符串
 	Keep(dst string) String           // 保留符合正则规则的字符串或指定字符串
@@ -35,7 +35,6 @@ type String interface {
 	SnakeCase() String                // 将英文字符转为蛇形格式
 	KebabCase() String                // 将英文字符转化为“烤串儿”格式
 	Lines() []string                  // 将行转为数组
-	Find(dst string) bool             // 查找文字都是存在
 	Split(sep string) []string        // 通过特定字符分割Text
 	SplitPlace(sep []int) []string    // 根据字符串的位置进行分割
 	SplitInt(sep int) []string        // 根据字数进行分割
@@ -75,8 +74,8 @@ func (t *snaketext) Replace(src, dst string) String {
 	return t
 }
 
-// IsMatch 判断字符串或符合正则规则的字符串是否存在 ...
-func (t *snaketext) IsMatch(dst string) bool {
+// Find 判断字符串或符合正则规则的字符串是否存在 ...
+func (t *snaketext) Find(dst string) bool {
 	if ok, err := regexp.MatchString(dst, t.Input); ok && err == nil {
 		return true
 	}
@@ -85,21 +84,14 @@ func (t *snaketext) IsMatch(dst string) bool {
 
 // Remove 根据正则规则删除字符串 ...
 func (t *snaketext) Remove(dst string) String {
-
-	d := regexp.MustCompile(dst).FindAll([]byte(t.Get()), -1)
-	for _, v := range d {
-		if t.IsMatch(dst) == true {
-			t.Replace(string(v), "")
-		}
-	}
-
+	t.Input = regexp.MustCompile(dst).ReplaceAllString(t.Input, "")
 	return t
 }
 
 // Keep 根据正则规则保留字符串 ...
 func (t *snaketext) Keep(dst string) String {
 
-	if t.IsMatch(dst) == true {
+	if t.Find(dst) == true {
 		p := Text()
 		d := regexp.MustCompile(dst).FindAll([]byte(t.Get()), -1)
 		for _, v := range d {
@@ -123,14 +115,11 @@ func (t *snaketext) Widen() String {
 	return t
 }
 
-// ReComment 去除注解...
+// ReComment 去除代码注解...
 func (t *snaketext) ReComment() String {
-	matchText := regexp.MustCompile(`\/\/.*`)
-	t.Input = matchText.ReplaceAllString(t.Input, "")
-	matchText = regexp.MustCompile(`\/\*(\s|.)*?\*\/`)
-	t.Input = matchText.ReplaceAllString(t.Input, "")
-	matchText = regexp.MustCompile(`(?m)^\s*$[\r\n]*|[\r\n]+\s+\z`)
-	t.Input = matchText.ReplaceAllString(t.Input, "")
+	t.Remove(`\/\/.*`).
+		Remove(`\/\*(\s|.)*?\*\/`).
+		Remove(`(?m)^\s*$[\r\n]*|[\r\n]+\s+\z`)
 	return t
 }
 
@@ -190,6 +179,7 @@ func (t *snaketext) Between(start, end string) String {
 }
 
 // EnBase Text to Base-x:  2 < base > 36 ...
+// 将Text转为2～36进制编码
 func (t *snaketext) EnBase(base int) String {
 	var r []string
 	for _, i := range []rune(t.Input) {
@@ -200,6 +190,7 @@ func (t *snaketext) EnBase(base int) String {
 }
 
 // DeBase Text Base-x to Text:  2 < base > 36 ...
+// 将2～36进制解码为Text
 func (t *snaketext) DeBase(base int) String {
 	var r []rune
 	for _, i := range t.Split(" ") {
@@ -248,11 +239,6 @@ func (t *snaketext) Get() string {
 	return t.Input
 }
 
-// Find 确定文字是否存在于字符串中 ...
-func (t *snaketext) Find(dst string) bool {
-	return strings.Contains(t.Input, dst)
-}
-
 // Split 根据字符串进行文本分割 ...
 func (t *snaketext) Split(sep string) []string {
 	return strings.Split(t.Input, sep)
@@ -280,7 +266,7 @@ func (t *snaketext) SplitPlace(sep []int) []string {
 	return a
 }
 
-// SplitInt 根据字符串的位置进行分割
+// SplitInt 根据设置对字符串等分
 // Text("abcdefg").SpltPlace([]int{1,3,4})
 // Out: []string{"a", "bc", "d", "efg"}
 func (t *snaketext) SplitInt(sep int) []string {
