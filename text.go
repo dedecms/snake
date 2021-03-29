@@ -17,9 +17,9 @@ type snaketext struct {
 type String interface {
 	Add(str ...string) String         // 在当前Text后追加字符
 	Find(dst string) bool             // 判断字符串或符合正则规则的字符串是否存在
-	Replace(src, dst string) String   // 字符替换
-	Remove(dst ...string) String      // 删除符合正则规则的字符串或指定字符串
 	Keep(dst string) String           // 保留符合正则规则的字符串或指定字符串
+	Remove(dst ...string) String      // 删除符合正则规则的字符串或指定字符串
+	Replace(src, dst string) String   // 字符替换
 	Widen() String                    // 半角字符转全角字符
 	Narrow() String                   // 全角字符转半角字符
 	ReComment() String                // 去除注解
@@ -70,7 +70,7 @@ func (t *snaketext) Add(str ...string) String {
 
 // Replace 字符替换 ...
 func (t *snaketext) Replace(src, dst string) String {
-	t.Input = strings.Replace(t.Input, src, dst, -1)
+	t.Input = regexp.MustCompile(src).ReplaceAllString(t.Input, dst)
 	return t
 }
 
