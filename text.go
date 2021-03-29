@@ -2,6 +2,7 @@ package snake
 
 import (
 	"bytes"
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -90,6 +91,7 @@ func (t *snaketext) Remove(dst string) String {
 	for _, v := range data {
 		if t.IsMatch(dst) == true {
 			t.Replace(string(v), "")
+			fmt.Println(1)
 		}
 	}
 
