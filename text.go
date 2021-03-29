@@ -99,7 +99,9 @@ func (t *snaketext) Remove(dst string) String {
 	if temp.IsMatch(dst) == true {
 		data := regexp.MustCompile(dst).FindAll([]byte(temp.Get()), -1)
 		for _, v := range data {
-			temp.Replace(string(v), "")
+			if temp.IsMatch(dst) == true {
+				temp.Replace(string(v), "")
+			}
 		}
 		return temp
 	}
