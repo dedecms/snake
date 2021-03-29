@@ -71,7 +71,7 @@ func (t *snaketext) Add(str ...string) String {
 
 // Replace 字符替换 ...
 func (t *snaketext) Replace(src, dst string) String {
-	fmt.Println(t.Find(dst))
+	fmt.Println(t.Find(src))
 	t.Input = regexp.MustCompile(src).ReplaceAllString(t.Input, dst)
 	return t
 }
