@@ -79,6 +79,22 @@ func (t *snaketext) Remove(dst string) String {
 	return t
 }
 
+// Keep 保留字符串 ...
+func (t *snaketext) Keep(dst string) String {
+
+	if ok, err := regexp.MatchString(dst, t.Input); ok && err == nil {
+		temp := Text()
+		for _, v := range t.Input {
+			if ok, err := regexp.MatchString(dst, string(v)); ok && err == nil {
+				temp.Add(string(v))
+			}
+		}
+		t.Input = temp.Get()
+	}
+
+	return t
+}
+
 // Narrow 全角字符转半角字符 ...
 func (t *snaketext) Narrow() String {
 	t.Input = width.Narrow.String(t.Input)
