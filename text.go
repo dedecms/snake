@@ -2,6 +2,7 @@ package snake
 
 import (
 	"bytes"
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -95,7 +96,7 @@ func (t *snaketext) Remove(dst ...string) String {
 
 // Keep 根据正则规则保留字符串 ...
 func (t *snaketext) Keep(dst string) String {
-
+	fmt.Println(t.Find(dst))
 	if t.Find(dst) == true {
 		p := Text()
 		d := regexp.MustCompile(dst).FindAll([]byte(t.Get()), -1)
