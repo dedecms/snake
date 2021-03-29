@@ -76,7 +76,15 @@ func (t *snaketext) Replace(src, dst string) String {
 
 // Remove 删除字符串 ...
 func (t *snaketext) Remove(dst string) String {
-	t.Input = strings.Replace(t.Input, dst, "", -1)
+
+	if ok, err := regexp.MatchString(dst, t.Input); ok && err == nil {
+		for _, v := range t.Input {
+			if ok, err := regexp.MatchString(dst, string(v)); ok && err == nil {
+				t.Input = strings.Replace(t.Input, string(v), "", -1)
+			}
+		}
+	}
+
 	return t
 }
 
