@@ -17,6 +17,7 @@ type snaketext struct {
 type String interface {
 	Add(str ...string) String         // 在当前Text后追加字符
 	Replace(src, dst string) String   // 字符替换
+	Keep(dst string) String           // 根据正则规则保留字符串 ...
 	Widen() String                    // 半角字符转全角字符
 	Narrow() String                   // 全角字符转半角字符
 	Remove(dst string) String         // 删除字符串
