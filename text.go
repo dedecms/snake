@@ -99,14 +99,13 @@ func (t *snaketext) Remove(dst string) String {
 // Keep 保留字符串 ...
 func (t *snaketext) Keep(dst string) String {
 
-	if ok, err := regexp.MatchString(dst, t.Input); ok && err == nil {
-		temp := Text()
-		for _, v := range t.Input {
-			if ok, err := regexp.MatchString(dst, string(v)); ok && err == nil {
-				temp.Add(string(v))
-			}
+	if t.IsMatch(dst) == true {
+		p := Text()
+		d := regexp.MustCompile(dst).FindAll([]byte(t.Get()), -1)
+		for _, v := range d {
+			p.Add(string(v))
 		}
-		t.Input = temp.Get()
+		return p
 	}
 
 	return t
