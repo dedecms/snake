@@ -77,7 +77,6 @@ func (t *snaketext) Add(str ...string) String {
 // 如需替换$等字符，请使用\\$
 // snake.Text("http://$1example.com").Replace("\\$1.*(.com)", "www.dedecms${1}")
 func (t *snaketext) Replace(src, dst string) String {
-	fmt.Println(t.Find(src))
 	t.Input = regexp.MustCompile(src).ReplaceAllString(t.Input, dst)
 	return t
 }
