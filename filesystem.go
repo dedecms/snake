@@ -3,8 +3,6 @@ package snake
 import (
 	"os"
 	"path/filepath"
-
-	"github.com/plandem/xlsx"
 )
 
 // FileSystem ...
@@ -19,7 +17,6 @@ type FileSystem interface {
 	MkDir(dst ...string) bool                 // 新建文件夹
 	MkFile(dst ...string) (FileOperate, bool) // 新建文件
 	Open() (FileOperate, bool)                // 打开文件
-	OpenXlsx() (Excel, bool)                  // 打开Excel Xlsx文件
 	Exist(dst ...string) bool                 // 判断目录或文件是否存在
 	Rm(dst ...string) bool                    // 删除目录或文件
 	Rn(newname string) bool                   // 修改目录或文件名
@@ -105,12 +102,6 @@ func (sk *snakeFileSystem) Rm(dst ...string) bool {
 func (sk *snakeFileSystem) Open() (FileOperate, bool) {
 	file, err := os.Open(sk.Path)
 	return File(file), err == nil
-}
-
-// OpenXlsx 打开Xlsx文件
-func (sk *snakeFileSystem) OpenXlsx() (Excel, bool) {
-	file, err := xlsx.Open(sk.Path)
-	return Xlsx(file), err == nil
 }
 
 // Rn 修改目录或文件名
