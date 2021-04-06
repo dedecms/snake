@@ -12,7 +12,7 @@ type snakefile struct {
 // FileOperate ...
 type FileOperate interface {
 	Get() *os.File
-	Text() String
+	String() String
 }
 
 // ---------------------------------------
@@ -32,11 +32,12 @@ func (sk *snakefile) Get() *os.File {
 }
 
 // Text 获取文本...
-func (sk *snakefile) Text() String {
+func (sk *snakefile) String() String {
 	var buf bytes.Buffer
 	_, err := buf.ReadFrom(sk.Input)
 	if err != nil {
 		// todo: 字符串转化错误消息
+		return Text()
 	}
 	return Text(buf.String())
 }
