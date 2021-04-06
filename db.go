@@ -16,16 +16,16 @@ type Database interface {
 }
 
 // DB Database 初始化 ...
-func DB(conf string) snakeDatabase {
-	var db snakeDatabase
+func DB(conf string) Database {
+	sk := &snakeDatabase{}
 	c := Text(conf).Split("@")
 	u := Text(c[0]).Split(":")
-	db.User = u[0]
-	db.Pass = u[1]
+	sk.User = u[0]
+	sk.Pass = u[1]
 	h := Text(c[1]).Split(":")
-	db.Host = h[0]
-	db.Port = h[1]
-	return db
+	sk.Host = h[0]
+	sk.Port = h[1]
+	return sk
 }
 
 type snakeDatabase struct {
