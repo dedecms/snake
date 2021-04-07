@@ -1141,6 +1141,7 @@ type FileSystem interface {
 	// Chmod()                         // 设置权限
 	// Chown()                         // 设置用户、用户组
 	Ext() string // 返回文件扩展名
+	MimeTypes() string
 	Get() string // 返回路径
 }
 
@@ -1243,7 +1244,7 @@ func (sk *snakeFileSystem) Ext() string {
 }
 
 // MimeTypes 根据文件名获取MimeTypes
-func (sk *snakeFileSystem) MimeTypes(extension string) string {
+func (sk *snakeFileSystem) MimeTypes() string {
 	return mimeTypes[Text(sk.Ext()).Trim(".").ToLower().Get()]
 }
 
