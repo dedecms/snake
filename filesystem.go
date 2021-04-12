@@ -1,6 +1,9 @@
 package snake
 
 import (
+	"crypto/md5"
+	"encoding/hex"
+	"io"
 	"os"
 	"path/filepath"
 )
@@ -1142,6 +1145,7 @@ type FileSystem interface {
 	// Chown()                         // 设置用户、用户组
 	Ext() string // 返回文件扩展名
 	MimeTypes() string
+	MD5() string // 返回文件MD5
 	Get() string // 返回路径
 }
 
@@ -1246,6 +1250,16 @@ func (sk *snakeFileSystem) Ext() string {
 // MimeTypes 根据文件名获取MimeTypes
 func (sk *snakeFileSystem) MimeTypes() string {
 	return mimeTypes[Text(sk.Ext()).Trim(".").ToLower().Get()]
+}
+
+// MD5 获取文件的MD5
+func (sk *snakeFileSystem) MD5() string {
+	hash := md5.New()
+	if f, ok := sk.Open(); ok {
+		io.Copy(hash, f.Get())
+		return hex.EncodeToString(hash.Sum(nil))
+	}
+	return ""
 }
 
 // MkDir 创建目录
