@@ -37,6 +37,7 @@ type String interface {
 	SnakeCase() String                // 将英文字符转为蛇形格式
 	KebabCase() String                // 将英文字符转化为“烤串儿”格式
 	Lines() []string                  // 将行转为数组
+	MD5() string                      // 输出字符串MD5
 	Split(sep string) []string        // 通过特定字符分割Text
 	SplitPlace(sep []int) []string    // 根据字符串的位置进行分割
 	SplitInt(sep int) []string        // 根据字数进行分割
