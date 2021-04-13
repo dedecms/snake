@@ -2,6 +2,8 @@ package snake
 
 import (
 	"bytes"
+	"crypto/md5"
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -306,6 +308,11 @@ func (t *snaketext) SplitInt(sep int) []string {
 // Lines 根据行进行分割字符 ...
 func (t *snaketext) Lines() []string {
 	return strings.Split(strings.TrimSuffix(t.Input, "\n"), "\n")
+}
+
+// MD5 获取文件的MD5
+func (t *snaketext) MD5() string {
+	return fmt.Sprintf("%x", md5.Sum([]byte(t.Get())))
 }
 
 // ---------------------------------------
