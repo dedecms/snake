@@ -1285,7 +1285,7 @@ func (sk *snakeFileSystem) Write(src string, add ...bool) bool {
 
 	defer f.Close()
 
-	if sk.IsFile() {
+	if sk.Exist() && sk.IsFile() {
 		if len(add) != 0 && add[0] == false {
 			f, err = os.OpenFile(sk.Path, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, os.ModeAppend)
 		} else {
