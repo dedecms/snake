@@ -1134,6 +1134,7 @@ type FileSystem interface {
 	Find(opt ...string) []string              // 查找文件
 	MkDir(dst ...string) bool                 // 新建文件夹
 	MkFile(dst ...string) (FileOperate, bool) // 新建文件
+	Write(src string, add ...bool) bool       // 写入文件
 	Open() (FileOperate, bool)                // 打开文件
 	Exist(dst ...string) bool                 // 判断目录或文件是否存在
 	Rm(dst ...string) bool                    // 删除目录或文件
