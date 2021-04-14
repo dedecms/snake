@@ -1277,6 +1277,34 @@ func (sk *snakeFileSystem) MkFile(dst ...string) (FileOperate, bool) {
 	return File(file), err == nil
 }
 
+// Write 写入文件, Add为是否追加写入，默认为覆盖写入
+func (sk *snakeFileSystem) Write(src string, add ...bool) bool {
+	var f *os.File
+	var err error
+
+	defer f.Close()
+
+	if sk.IsFile() {
+		if len(add) != 0 && add[0] == false {
+			f, err = os.OpenFile(sk.Path, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, os.ModeAppend)
+		} else {
+			f, err = os.OpenFile(sk.Path, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
+		}
+	} else {
+		f, err = os.Create(sk.Path)
+	}
+
+	if err == nil {
+		_, err = f.Write([]byte(src))
+	}
+
+	if err == nil {
+		return true
+	}
+
+	return false
+}
+
 // Exist 判断文件或目录是否存在
 func (sk *snakeFileSystem) Exist(dst ...string) bool {
 	if _, err := os.Stat(sk.pathdst(dst...)); err != nil {
