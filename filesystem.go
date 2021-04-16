@@ -1292,7 +1292,9 @@ func (sk *snakeFileSystem) Write(src string, add ...bool) bool {
 			f, err = os.OpenFile(sk.Path, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
 		}
 	} else {
-		f, err = os.Create(sk.Path)
+		if skf, ok := sk.MkFile(); ok {
+			f = skf.Get()
+		}
 	}
 
 	if err == nil {
