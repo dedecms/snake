@@ -41,6 +41,7 @@ type String interface {
 	Split(sep string) []string        // 通过特定字符分割Text
 	SplitPlace(sep []int) []string    // 根据字符串的位置进行分割
 	SplitInt(sep int) []string        // 根据字数进行分割
+	Extract(dst string) []string      // 提取正则文字数组
 	Get() string                      // 输出Text
 }
 
