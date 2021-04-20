@@ -122,19 +122,14 @@ func (t *snaketext) Keep(dst string) String {
 
 // Keep 根据正则规则保留字符串 ...
 func (t *snaketext) Extract(dst string) []string {
-
+	arr := []string{}
 	if t.Find(dst) == true {
-		p := Text()
 		d := regexp.MustCompile(dst).FindAll([]byte(t.Get()), -1)
-
 		for _, v := range d {
-			fmt.Println(string(v))
+			arr = append(arr, string(v))
 		}
-
-		t.Input = p.Get()
 	}
-
-	return []string{}
+	return arr
 }
 
 // Narrow 全角字符转半角字符 ...
