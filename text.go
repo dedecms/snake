@@ -119,6 +119,23 @@ func (t *snaketext) Keep(dst string) String {
 	return t
 }
 
+// Keep 根据正则规则保留字符串 ...
+func (t *snaketext) Extract(dst string) []string {
+
+	if t.Find(dst) == true {
+		p := Text()
+		d := regexp.MustCompile(dst).FindAll([]byte(t.Get()), -1)
+
+		for _, v := range d {
+			fmt.Println(v)
+		}
+
+		t.Input = p.Get()
+	}
+
+	return []string{}
+}
+
 // Narrow 全角字符转半角字符 ...
 func (t *snaketext) Narrow() String {
 	t.Input = width.Narrow.String(t.Input)
