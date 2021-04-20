@@ -41,7 +41,7 @@ type String interface {
 	Split(sep string) []string                     // 通过特定字符分割Text
 	SplitPlace(sep []int) []string                 // 根据字符串的位置进行分割
 	SplitInt(sep int) []string                     // 根据字数进行分割
-	Extract(dst string) []string                   // 提取正则文字数组
+	Extract(dst string, out ...string) []string    // 提取正则文字数组
 	Get() string                                   // 输出Text
 }
 
@@ -125,13 +125,22 @@ func (t *snaketext) Keep(dst string) String {
 }
 
 // Extract 根据正则规则提取字符数组 ...
-func (t *snaketext) Extract(dst string) []string {
+func (t *snaketext) Extract(dst string, out ...string) []string {
 	arr := []string{}
 	if t.Find(dst) == true {
 		d := regexp.MustCompile(dst).FindAll([]byte(t.Get()), -1)
+		if len(out) > 0 && out[0] != "" {
+			for _, v := range d {
+				arr = append(arr, Text(string(v)).Replace(dst, out[0]).Get())
+			}
+
+			return arr
+		}
+
 		for _, v := range d {
 			arr = append(arr, string(v))
 		}
+
 	}
 	return arr
 }
