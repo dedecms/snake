@@ -128,7 +128,7 @@ func (t *snaketext) Extract(dst string) []string {
 		d := regexp.MustCompile(dst).FindAll([]byte(t.Get()), -1)
 
 		for _, v := range d {
-			fmt.Println(v)
+			fmt.Println(string(v))
 		}
 
 		t.Input = p.Get()
