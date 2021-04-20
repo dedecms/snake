@@ -17,32 +17,32 @@ type snaketext struct {
 
 // String ...
 type String interface {
-	Add(str ...string) String         // 在当前Text后追加字符
-	Find(dst string) bool             // 判断字符串或符合正则规则的字符串是否存在
-	Keep(dst string) String           // 保留符合正则规则的字符串或指定字符串
-	Remove(dst ...string) String      // 删除符合正则规则的字符串或指定字符串
-	Replace(src, dst string) String   // 替换字符串或符合正则规则的字符串
-	Widen() String                    // 半角字符转全角字符
-	Narrow() String                   // 全角字符转半角字符
-	ReComment() String                // 去除注解
-	Between(start, end string) String // 取A字符与B字符之间的字符
-	Trim(sep string) String           // 去除首尾的特定字符
-	ToLower() String                  // 英文字母全部转为小写
-	ToUpper() String                  // 英文字母全部转为大写
-	LcFirst() String                  // 英文首字母小写
-	UcFirst() String                  // 英文首字母大写
-	EnBase(base int) String           // 将Text转为2～36进制编码
-	DeBase(base int) String           // 将2～36进制解码为Text
-	CamelCase() String                // 将英文字符转为驼峰格式
-	SnakeCase() String                // 将英文字符转为蛇形格式
-	KebabCase() String                // 将英文字符转化为“烤串儿”格式
-	Lines() []string                  // 将行转为数组
-	MD5() string                      // 输出字符串MD5
-	Split(sep string) []string        // 通过特定字符分割Text
-	SplitPlace(sep []int) []string    // 根据字符串的位置进行分割
-	SplitInt(sep int) []string        // 根据字数进行分割
-	Extract(dst string) []string      // 提取正则文字数组
-	Get() string                      // 输出Text
+	Add(str ...string) String                      // 在当前Text后追加字符
+	Find(dst string) bool                          // 判断字符串或符合正则规则的字符串是否存在
+	Keep(dst string) String                        // 保留符合正则规则的字符串或指定字符串
+	Remove(dst ...string) String                   // 删除符合正则规则的字符串或指定字符串
+	Replace(src, dst string, noreg ...bool) String // 替换字符串或符合正则规则的字符串,noreg = true则不使用正则，直接替换
+	Widen() String                                 // 半角字符转全角字符
+	Narrow() String                                // 全角字符转半角字符
+	ReComment() String                             // 去除注解
+	Between(start, end string) String              // 取A字符与B字符之间的字符
+	Trim(sep string) String                        // 去除首尾的特定字符
+	ToLower() String                               // 英文字母全部转为小写
+	ToUpper() String                               // 英文字母全部转为大写
+	LcFirst() String                               // 英文首字母小写
+	UcFirst() String                               // 英文首字母大写
+	EnBase(base int) String                        // 将Text转为2～36进制编码
+	DeBase(base int) String                        // 将2～36进制解码为Text
+	CamelCase() String                             // 将英文字符转为驼峰格式
+	SnakeCase() String                             // 将英文字符转为蛇形格式
+	KebabCase() String                             // 将英文字符转化为“烤串儿”格式
+	Lines() []string                               // 将行转为数组
+	MD5() string                                   // 输出字符串MD5
+	Split(sep string) []string                     // 通过特定字符分割Text
+	SplitPlace(sep []int) []string                 // 根据字符串的位置进行分割
+	SplitInt(sep int) []string                     // 根据字数进行分割
+	Extract(dst string) []string                   // 提取正则文字数组
+	Get() string                                   // 输出Text
 }
 
 // ---------------------------------------
@@ -79,7 +79,11 @@ func (t *snaketext) Add(str ...string) String {
 // out: http://www.dedecms.com
 // 如需替换$等字符，请使用\\$
 // snake.Text("http://$1example.com").Replace("\\$1.*(.com)", "www.dedecms${1}")
-func (t *snaketext) Replace(src, dst string) String {
+func (t *snaketext) Replace(src, dst string, noreg ...bool) String {
+	if len(noreg) > 0 && noreg[0] == true {
+		t.Input = strings.Replace(t.Input, src, dst, -1)
+		return t
+	}
 	t.Input = regexp.MustCompile(src).ReplaceAllString(t.Input, dst)
 	return t
 }
@@ -120,7 +124,7 @@ func (t *snaketext) Keep(dst string) String {
 	return t
 }
 
-// Keep 根据正则规则保留字符串 ...
+// Extract 根据正则规则提取字符数组 ...
 func (t *snaketext) Extract(dst string) []string {
 	arr := []string{}
 	if t.Find(dst) == true {
