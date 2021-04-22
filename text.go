@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/md5"
 	"fmt"
+	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
@@ -38,11 +39,12 @@ type String interface {
 	KebabCase() String                             // 将英文字符转化为“烤串儿”格式
 	Lines() []string                               // 将行转为数组
 	MD5() string                                   // 输出字符串MD5
-	Split(sep string) []string                     // 通过特定字符分割Text
-	SplitPlace(sep []int) []string                 // 根据字符串的位置进行分割
-	SplitInt(sep int) []string                     // 根据字数进行分割
-	Extract(dst string, out ...string) []string    // 提取正则文字数组
-	Get() string                                   // 输出Text
+	Unescape() string
+	Split(sep string) []string                  // 通过特定字符分割Text
+	SplitPlace(sep []int) []string              // 根据字符串的位置进行分割
+	SplitInt(sep int) []string                  // 根据字数进行分割
+	Extract(dst string, out ...string) []string // 提取正则文字数组
+	Get() string                                // 输出Text
 }
 
 // ---------------------------------------
@@ -340,6 +342,19 @@ func (t *snaketext) Lines() []string {
 // MD5 获取文件的MD5
 func (t *snaketext) MD5() string {
 	return fmt.Sprintf("%x", md5.Sum([]byte(t.Get())))
+}
+
+func (t *snaketext) Unescape() string {
+	if html, err := url.QueryUnescape(Text(t.Get()).Replace(`%u(.{4})`, "/u$1/").Get()); err == nil {
+		temp := Text(html)
+		for _, v := range t.Extract(`/u(.{4})?/`) {
+			if w, err := strconv.Unquote(`"` + Text(v).Replace(`/u(.{4})?/`, "\\u$1").Get() + `"`); err == nil {
+				temp.Replace(v, w, true)
+			}
+		}
+		return temp.Get()
+	}
+	return t.Get()
 }
 
 // ---------------------------------------
