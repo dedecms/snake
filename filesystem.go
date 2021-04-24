@@ -1222,7 +1222,6 @@ func (sk *snakeFileSystem) Rm(dst ...string) bool {
 // Open 打开文件
 func (sk *snakeFileSystem) Open() (FileOperate, bool) {
 	file, err := os.Open(sk.Path)
-	defer file.Close()
 	return File(file), err == nil
 }
 
@@ -1258,6 +1257,7 @@ func (sk *snakeFileSystem) MimeTypes() string {
 func (sk *snakeFileSystem) MD5() string {
 	hash := md5.New()
 	if f, ok := sk.Open(); ok {
+		defer f.Close()
 		io.Copy(hash, f.Get())
 		return hex.EncodeToString(hash.Sum(nil))
 	}
