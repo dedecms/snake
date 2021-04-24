@@ -1222,6 +1222,7 @@ func (sk *snakeFileSystem) Rm(dst ...string) bool {
 // Open 打开文件
 func (sk *snakeFileSystem) Open() (FileOperate, bool) {
 	file, err := os.Open(sk.Path)
+	defer file.Close()
 	return File(file), err == nil
 }
 
@@ -1275,6 +1276,7 @@ func (sk *snakeFileSystem) MkFile(dst ...string) (FileOperate, bool) {
 		sk.MkDir(p.Dir())
 	}
 	file, err := os.Create(p.Get())
+	defer file.Close()
 	return File(file), err == nil
 }
 
