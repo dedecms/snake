@@ -13,6 +13,7 @@ type snakefile struct {
 type FileOperate interface {
 	Get() *os.File
 	String() String
+	Close() error // 关闭文件链接
 }
 
 // ---------------------------------------
@@ -29,6 +30,11 @@ func File(f *os.File) FileOperate {
 // Get 获取文本...
 func (sk *snakefile) Get() *os.File {
 	return sk.Input
+}
+
+// Add 在字符串中追加文字...
+func (sk *snakefile) Close() error {
+	return sk.Input.Close()
 }
 
 // Text 获取文本...
