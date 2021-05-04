@@ -164,7 +164,6 @@ func (sk *snakeFileSystem) MkFile(dst ...string) (FileOperate, bool) {
 		sk.MkDir(p.Dir())
 	}
 	file, err := os.Create(p.Get())
-
 	return File(file), err == nil
 }
 
@@ -184,6 +183,7 @@ func (sk *snakeFileSystem) Write(src string, add ...bool) bool {
 	} else {
 		if skf, ok := sk.MkFile(); ok {
 			f = skf.Get()
+
 		}
 	}
 
