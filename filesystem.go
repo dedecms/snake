@@ -6,6 +6,8 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+
+	"github.com/jinzhu/configor"
 )
 
 // FileSystem ...
@@ -31,8 +33,9 @@ type FileSystem interface {
 	// Chown()                         // 设置用户、用户组
 	Ext() string // 返回文件扩展名
 	MimeTypes() string
-	MD5() string // 返回文件MD5
-	Get() string // 返回路径
+	MD5() string                    // 返回文件MD5
+	Config(conf *interface{}) error // 加载配置文件
+	Get() string                    // 返回路径
 }
 
 type snakeFileSystem struct {
@@ -265,4 +268,9 @@ func (sk *snakeFileSystem) pathdst(dst ...string) string {
 // Get 获取文本...
 func (sk *snakeFileSystem) Get() string {
 	return sk.Path
+}
+
+// Config 加载配置文件...
+func (sk *snakeFileSystem) Config(conf *interface{}) error {
+	return configor.Load(&conf, sk.Path)
 }
