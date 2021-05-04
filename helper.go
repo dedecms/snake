@@ -1,10 +1,14 @@
 package snake
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 	"unicode"
+
+	"golang.org/x/text/encoding"
+	"golang.org/x/text/encoding/ianaindex"
 )
 
 // ucfirst 英文首字母大写 ...
@@ -31,9 +35,7 @@ func walkPath(path string, dst ...string) []string {
 		if err == nil && info.IsDir() {
 			for _, v := range dst {
 				if l, err := filepath.Glob(filepath.Join(p, filepath.Base(v))); len(l) != 0 && err == nil {
-					for _, i := range l {
-						res = append(res, i)
-					}
+					res = append(res, l...)
 				} else {
 					return err
 				}
@@ -49,9 +51,7 @@ func ls(path string, dst ...string) []string {
 	var res []string
 	for _, v := range dst {
 		if l, err := filepath.Glob(filepath.Join(path, v)); err == nil {
-			for _, i := range l {
-				res = append(res, i)
-			}
+			res = append(res, l...)
 		}
 	}
 	return res
@@ -69,4 +69,23 @@ func _owcpfile(src FileSystem, dst FileSystem) bool {
 		}
 	}
 	return false
+}
+
+func getEncoding(charset string) encoding.Encoding {
+	if e, err := ianaindex.MIB.Encoding(charset); err == nil && e != nil {
+		return e
+	}
+	return nil
+}
+
+func prenum(data byte) int {
+	str := fmt.Sprintf("%b", data)
+	var i int = 0
+	for i < len(str) {
+		if str[i] != '1' {
+			break
+		}
+		i++
+	}
+	return i
 }

@@ -1181,7 +1181,7 @@ func (sk *snakeFileSystem) Cp(dir string, overwrite bool) bool {
 	dst := FS(dir)
 
 	// todo:目标存在则返回错误
-	if dst.Add(sk.Base()).Exist() && overwrite == false {
+	if dst.Add(sk.Base()).Exist() && !overwrite {
 		return false
 	}
 
@@ -1272,11 +1272,11 @@ func (sk *snakeFileSystem) MkDir(dst ...string) bool {
 // MkFile 创建文件
 func (sk *snakeFileSystem) MkFile(dst ...string) (FileOperate, bool) {
 	p := FS(sk.pathdst(dst...))
-	if FS(p.Dir()).Exist() == false {
+	if !FS(p.Dir()).Exist() {
 		sk.MkDir(p.Dir())
 	}
 	file, err := os.Create(p.Get())
-	defer file.Close()
+
 	return File(file), err == nil
 }
 
@@ -1288,7 +1288,7 @@ func (sk *snakeFileSystem) Write(src string, add ...bool) bool {
 	defer f.Close()
 
 	if sk.Exist() && sk.IsFile() {
-		if len(add) != 0 && add[0] == false {
+		if len(add) != 0 && !add[0] {
 			f, err = os.OpenFile(sk.Path, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, os.ModeAppend)
 		} else {
 			f, err = os.OpenFile(sk.Path, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
@@ -1355,7 +1355,7 @@ func (sk *snakeFileSystem) Base() string {
 
 // IsDir 判断是否是目录
 func (sk *snakeFileSystem) IsDir(dst ...string) bool {
-	if i, err := os.Stat(sk.pathdst(dst...)); os.IsExist(err) == false {
+	if i, err := os.Stat(sk.pathdst(dst...)); !os.IsExist(err) {
 		return i.Mode().IsDir()
 	}
 	return false
@@ -1363,7 +1363,7 @@ func (sk *snakeFileSystem) IsDir(dst ...string) bool {
 
 // IsFile 判断是否是目录
 func (sk *snakeFileSystem) IsFile(dst ...string) bool {
-	if i, err := os.Stat(sk.pathdst(dst...)); os.IsExist(err) == false {
+	if i, err := os.Stat(sk.pathdst(dst...)); !os.IsExist(err) {
 		return i.Mode().IsRegular()
 	}
 	return false

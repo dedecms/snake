@@ -4,11 +4,16 @@ import (
 	"bytes"
 	"crypto/md5"
 	"fmt"
+	"html"
+	"io/ioutil"
 	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
+	"unicode"
 
+	"github.com/yuin/charsetutil"
+	"golang.org/x/text/transform"
 	"golang.org/x/text/width"
 )
 
@@ -39,12 +44,16 @@ type String interface {
 	KebabCase() String                             // 将英文字符转化为“烤串儿”格式
 	Lines() []string                               // 将行转为数组
 	MD5() string                                   // 输出字符串MD5
+	IsGBK() bool                                   // 字符串编码是否为GBK
+	ExistHan() bool                                // 字符串中是否存在汉字
+	ToUTF8() (string, bool)                        // 将字符串转化为UTF-8编码
 	Unescape() string
 	Split(sep string) []string                  // 通过特定字符分割Text
 	SplitPlace(sep []int) []string              // 根据字符串的位置进行分割
 	SplitInt(sep int) []string                  // 根据字数进行分割
 	Extract(dst string, out ...string) []string // 提取正则文字数组
 	Get() string                                // 输出Text
+	Byte() []byte
 }
 
 // ---------------------------------------
@@ -82,7 +91,7 @@ func (t *snaketext) Add(str ...string) String {
 // 如需替换$等字符，请使用\\$
 // snake.Text("http://$1example.com").Replace("\\$1.*(.com)", "www.dedecms${1}")
 func (t *snaketext) Replace(src, dst string, noreg ...bool) String {
-	if len(noreg) > 0 && noreg[0] == true {
+	if len(noreg) > 0 && noreg[0] {
 		t.Input = strings.Replace(t.Input, src, dst, -1)
 		return t
 	}
@@ -112,7 +121,7 @@ func (t *snaketext) Remove(dst ...string) String {
 // Keep 根据正则规则保留字符串 ...
 func (t *snaketext) Keep(dst string) String {
 
-	if t.Find(dst) == true {
+	if t.Find(dst) {
 		p := Text()
 		d := regexp.MustCompile(dst).FindAll([]byte(t.Get()), -1)
 
@@ -129,7 +138,7 @@ func (t *snaketext) Keep(dst string) String {
 // Extract 根据正则规则提取字符数组 ...
 func (t *snaketext) Extract(dst string, out ...string) []string {
 	arr := []string{}
-	if t.Find(dst) == true {
+	if t.Find(dst) {
 		d := regexp.MustCompile(dst).FindAll([]byte(t.Get()), -1)
 		if len(out) > 0 && out[0] != "" {
 			for _, v := range d {
@@ -227,7 +236,7 @@ func (t *snaketext) Between(start, end string) String {
 // 将Text转为2～36进制编码
 func (t *snaketext) EnBase(base int) String {
 	var r []string
-	for _, i := range []rune(t.Input) {
+	for _, i := range t.Input {
 		r = append(r, strconv.FormatInt(int64(i), base))
 	}
 	t.Input = strings.Join(r, " ")
@@ -284,6 +293,12 @@ func (t *snaketext) Get() string {
 	return t.Input
 }
 
+// Byte Function
+// 获取字符串的Byte ...
+func (t *snaketext) Byte() []byte {
+	return []byte(t.Input)
+}
+
 // Split 根据字符串进行文本分割 ...
 func (t *snaketext) Split(sep string) []string {
 	return strings.Split(t.Input, sep)
@@ -318,7 +333,7 @@ func (t *snaketext) SplitInt(sep int) []string {
 	var a []string
 	b := Text()
 	i := 0
-	for _, v := range []rune(t.Get()) {
+	for _, v := range t.Input {
 		b.Add(string(v))
 
 		i = i + len(string(v))
@@ -355,6 +370,129 @@ func (t *snaketext) Unescape() string {
 		return temp.Get()
 	}
 	return t.Get()
+}
+
+// ---------------------------------------
+// 字符集 :
+
+// Charset Function
+// 返回当前进程的字符集 ...
+func (t *snaketext) Charset() (string, bool) {
+
+	// 自动获取编码 ...
+	encoding, err := charsetutil.GuessBytes(t.Byte())
+
+	// 如果自动获取成功或encoding不为空
+	// 则输出编码格式 ...
+	if err == nil {
+		return strings.ToUpper(encoding.Charset()), true
+	}
+
+	if t.IsGBK() {
+		return "GBK", true
+	}
+
+	if encoding != nil && encoding.Charset() != "WINDOWS-1252" {
+		return strings.ToUpper(encoding.Charset()), true
+	}
+
+	// 如果内容中出现汉字
+	// 则输出GB18030 ...
+	if t.ExistHan() {
+		return "GBK", true
+	}
+
+	// 不符合上述条件
+	// 则返回空 ...
+	return "", false
+}
+
+// ExistHan Function
+// 判断是否存在中文 ...
+func (t *snaketext) ExistHan() bool {
+	hanLen := len(regexp.MustCompile(`[\P{Han}]`).ReplaceAllString(t.Input, ""))
+	for _, r := range t.Input {
+		if unicode.Is(unicode.Scripts["Han"], r) || hanLen > 0 {
+			return true
+		}
+	}
+	return false
+}
+
+// ExistGBK Function
+// 判断是否为GBK ...
+func (t *snaketext) IsGBK() bool {
+	arr := t.Byte()
+	var i int = 0
+	for i < len(t.Byte()) {
+		if arr[i] <= 0xff {
+			i++
+			continue
+		} else {
+			if arr[i] >= 0x81 &&
+				arr[i] <= 0xfe &&
+				arr[i+1] >= 0x40 &&
+				arr[i+1] <= 0xfe &&
+				arr[i+1] != 0xf7 {
+				i += 2
+				continue
+			} else {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+// 判断是否为UTF8
+func (t *snaketext) IsUTF8() bool {
+	data := t.Byte()
+	for i := 0; i < len(data); {
+		if data[i]&0x80 == 0x00 {
+			i++
+			continue
+		} else if num := prenum(data[i]); num > 2 {
+			i++
+			for j := 0; j < num-1; j++ {
+				if data[i]&0xc0 != 0x80 {
+					return false
+				}
+				i++
+			}
+		} else {
+			return false
+		}
+	}
+	return true
+}
+
+// ToUTF8 Function
+// 运行对当前进程进行编码转换成UTF-8 ...
+func (t *snaketext) ToUTF8() (string, bool) {
+
+	// 自动获取资源编码 ...
+	charset, ok := t.Charset()
+
+	// 未获取到资源编码 ...
+	if !ok {
+		return t.Input, false
+	}
+
+	// UTF-8无需转换 ...
+	if charset == "UTF-8" {
+		return t.Input, true
+	}
+
+	if encode := getEncoding(charset); encode != nil {
+		if reader, err := ioutil.ReadAll(transform.NewReader(bytes.NewReader(t.Byte()), encode.NewDecoder())); err == nil {
+			t.Input = string(reader)
+			t.Input = html.UnescapeString(t.Input)
+			return t.Input, true
+		}
+	}
+
+	// 转码失败
+	return t.Input, false
 }
 
 // ---------------------------------------
