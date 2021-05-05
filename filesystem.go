@@ -37,6 +37,7 @@ type FileSystem interface {
 	MD5() string                   // 返回文件MD5
 	Config(conf interface{}) error // 加载配置文件
 	Get() string                   // 返回路径
+	Unzip() error
 }
 
 type snakeFileSystem struct {
