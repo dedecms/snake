@@ -272,5 +272,5 @@ func (sk *snakeFileSystem) Get() string {
 
 // Config 加载配置文件...
 func (sk *snakeFileSystem) Config(conf interface{}) error {
-	return configor.Load(&conf, sk.Path)
+	return configor.Load(conf, sk.Path)
 }
