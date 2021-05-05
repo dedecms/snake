@@ -1,6 +1,7 @@
 package snake
 
 import (
+	"archive/zip"
 	"crypto/md5"
 	"encoding/hex"
 	"io"
@@ -273,4 +274,50 @@ func (sk *snakeFileSystem) Get() string {
 // Config 加载配置文件...
 func (sk *snakeFileSystem) Config(conf interface{}) error {
 	return configor.Load(conf, sk.Path)
+}
+
+func (sk *snakeFileSystem) Unzip() error {
+
+	z, err := zip.OpenReader(sk.Path)
+
+	if err != nil {
+		return err
+	}
+
+	defer z.Close()
+
+	for _, file := range z.File {
+
+		item := FS(sk.Dir()).Add(file.Name)
+
+		// 如果是目录，则创建目录
+		if file.FileInfo().IsDir() && item.MkDir() {
+			continue
+		}
+
+		// 获取到 Reader
+		f, err := file.Open()
+
+		if err != nil {
+			return err
+		}
+
+		defer f.Close()
+
+		out, err := os.OpenFile(file.Name, os.O_CREATE|os.O_RDWR|os.O_TRUNC, file.Mode())
+
+		if err != nil {
+			return err
+
+		}
+		_, err = io.Copy(out, f)
+
+		if err != nil {
+			return err
+		}
+
+		defer out.Close()
+	}
+
+	return nil
 }
