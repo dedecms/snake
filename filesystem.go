@@ -37,7 +37,7 @@ type FileSystem interface {
 	MD5() string                   // 返回文件MD5
 	Config(conf interface{}) error // 加载配置文件
 	Get() string                   // 返回路径
-	Unzip() error
+	Unzip() (string, error)
 }
 
 type snakeFileSystem struct {
@@ -277,19 +277,23 @@ func (sk *snakeFileSystem) Config(conf interface{}) error {
 	return configor.Load(conf, sk.Path)
 }
 
-func (sk *snakeFileSystem) Unzip() error {
+func (sk *snakeFileSystem) Unzip() (string, error) {
+
+	base := FS(sk.Dir()).Add(Text(sk.Base()).Remove(sk.Ext()).Get())
 
 	z, err := zip.OpenReader(sk.Path)
 
 	if err != nil {
-		return err
+		return base.Get(), err
 	}
 
 	defer z.Close()
 
+	base.MkDir()
+
 	for _, file := range z.File {
 
-		item := FS(Text(sk.Base()).Remove(sk.Ext()).Get()).Add(file.Name)
+		item := FS(base.Get()).Add(file.Name)
 
 		// 如果是目录，则创建目录
 		if file.FileInfo().IsDir() && item.MkDir() {
@@ -300,25 +304,29 @@ func (sk *snakeFileSystem) Unzip() error {
 		f, err := file.Open()
 
 		if err != nil {
-			return err
+			return base.Get(), err
 		}
 
 		defer f.Close()
 
+		if !FS(item.Dir()).Exist() {
+			sk.MkDir(item.Dir())
+		}
+
 		out, err := os.OpenFile(item.Get(), os.O_CREATE|os.O_RDWR|os.O_TRUNC, file.Mode())
 
 		if err != nil {
-			return err
+			return base.Get(), err
 
 		}
 		_, err = io.Copy(out, f)
 
 		if err != nil {
-			return err
+			return base.Get(), err
 		}
 
 		defer out.Close()
 	}
 
-	return nil
+	return base.Get(), nil
 }
