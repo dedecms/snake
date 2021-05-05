@@ -289,7 +289,7 @@ func (sk *snakeFileSystem) Unzip() error {
 
 	for _, file := range z.File {
 
-		item := FS(sk.Dir()).Add(file.Name)
+		item := FS(Text(sk.Base()).Remove(sk.Ext()).Get()).Add(file.Name)
 
 		// 如果是目录，则创建目录
 		if file.FileInfo().IsDir() && item.MkDir() {
@@ -305,7 +305,7 @@ func (sk *snakeFileSystem) Unzip() error {
 
 		defer f.Close()
 
-		out, err := os.OpenFile(file.Name, os.O_CREATE|os.O_RDWR|os.O_TRUNC, file.Mode())
+		out, err := os.OpenFile(item.Get(), os.O_CREATE|os.O_RDWR|os.O_TRUNC, file.Mode())
 
 		if err != nil {
 			return err
