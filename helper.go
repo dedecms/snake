@@ -36,8 +36,6 @@ func walkPath(path string, dst ...string) []string {
 			for _, v := range dst {
 				if l, err := filepath.Glob(filepath.Join(p, filepath.Base(v))); len(l) != 0 && err == nil {
 					res = append(res, l...)
-				} else {
-					return err
 				}
 			}
 		}

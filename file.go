@@ -45,5 +45,6 @@ func (sk *snakefile) String() String {
 		// todo: 字符串转化错误消息
 		return Text()
 	}
+
 	return Text(buf.String())
 }
