@@ -53,6 +53,7 @@ type String interface {
 	SplitInt(sep int) []string                  // 根据字数进行分割
 	Extract(dst string, out ...string) []string // 提取正则文字数组
 	Get() string                                // 输出Text
+	LF() string                                 // 输出Text
 	Byte() []byte
 }
 
@@ -291,6 +292,11 @@ func (t *snaketext) KebabCase() String {
 // Get 获取文本...
 func (t *snaketext) Get() string {
 	return t.Input
+}
+
+// 以LF格式输出...
+func (t *snaketext) LF() string {
+	return t.Replace("\r\n", "\n", true).Get()
 }
 
 // Byte Function
