@@ -24,7 +24,7 @@ type snaketext struct {
 // String ...
 type String interface {
 	Add(str ...string) String                      // 在当前Text后追加字符
-	Find(dst string) bool                          // 判断字符串或符合正则规则的字符串是否存在
+	Find(dst string, noreg ...bool) bool           // 判断字符串或符合正则规则的字符串是否存在
 	Keep(dst string) String                        // 保留符合正则规则的字符串或指定字符串
 	Remove(dst ...string) String                   // 删除符合正则规则的字符串或指定字符串
 	Replace(src, dst string, noreg ...bool) String // 替换字符串或符合正则规则的字符串,noreg = true则不使用正则，直接替换
@@ -101,7 +101,12 @@ func (t *snaketext) Replace(src, dst string, noreg ...bool) String {
 }
 
 // Find 判断字符串或符合正则规则的字符串是否存在 ...
-func (t *snaketext) Find(dst string) bool {
+func (t *snaketext) Find(dst string, noreg ...bool) bool {
+
+	if len(noreg) > 0 && noreg[0] {
+		return strings.Contains(t.Input, dst)
+	}
+
 	if d := regexp.MustCompile(dst).FindAll([]byte(t.Input), -1); len(d) > 0 {
 		return true
 	}
