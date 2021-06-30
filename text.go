@@ -24,6 +24,7 @@ type snaketext struct {
 // String ...
 type String interface {
 	Add(str ...string) String                      // 在当前Text后追加字符
+	Ln() String                                    // 在当前Text后追加回车
 	Find(dst string, noreg ...bool) bool           // 判断字符串或符合正则规则的字符串是否存在
 	Keep(dst string) String                        // 保留符合正则规则的字符串或指定字符串
 	Remove(dst ...string) String                   // 删除符合正则规则的字符串或指定字符串
@@ -79,6 +80,11 @@ func (t *snaketext) Add(str ...string) String {
 	}
 	t.Input = b.String()
 	return t
+}
+
+// LN 回车...
+func (t *snaketext) Ln() String {
+	return t.Add("\n")
 }
 
 // ---------------------------------------

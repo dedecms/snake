@@ -3,6 +3,7 @@ package snake
 import (
 	"archive/zip"
 	"crypto/md5"
+	"crypto/sha256"
 	"encoding/hex"
 	"io"
 	"os"
@@ -35,6 +36,7 @@ type FileSystem interface {
 	Ext() string // 返回文件扩展名
 	MimeTypes() string
 	MD5() string                   // 返回文件MD5
+	SHA256() string                // 返回文件SHA256
 	Config(conf interface{}) error // 加载配置文件
 	Get() string                   // 返回路径
 	Unzip() (string, error)
@@ -146,6 +148,17 @@ func (sk *snakeFileSystem) MimeTypes() string {
 // MD5 获取文件的MD5
 func (sk *snakeFileSystem) MD5() string {
 	hash := md5.New()
+	if f, ok := sk.Open(); ok {
+		defer f.Close()
+		io.Copy(hash, f.Get())
+		return hex.EncodeToString(hash.Sum(nil))
+	}
+	return ""
+}
+
+// SHA256 获取文件的SHA256
+func (sk *snakeFileSystem) SHA256() string {
+	hash := sha256.New()
 	if f, ok := sk.Open(); ok {
 		defer f.Close()
 		io.Copy(hash, f.Get())
