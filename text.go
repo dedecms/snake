@@ -55,7 +55,7 @@ type String interface {
 	Extract(dst string, out ...string) []string // 提取正则文字数组
 	Get() string                                // 输出Text
 	LF() string                                 // 输出Text
-	Write(dst string) bool                      // 写入文件
+	Write(dst string, add ...bool) bool         // 写入文件
 	Byte() []byte
 }
 
@@ -521,8 +521,8 @@ func (t *snaketext) ToUTF8() (string, bool) {
 }
 
 // LCFirst 字符串首字母小写 ...
-func (t *snaketext) Write(dst string) bool {
-	return FS(dst).Write(t.Get(), false)
+func (t *snaketext) Write(dst string, add ...bool) bool {
+	return FS(dst).Write(t.Get(), add...)
 }
 
 // ---------------------------------------
