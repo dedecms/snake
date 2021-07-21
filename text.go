@@ -47,7 +47,7 @@ func (t *snakeString) Add(str ...interface{}) *snakeString {
 }
 
 // AddSlice 通过Slice在字符串中追加文字...
-func (t *snakeString) AddSlice(dts []string) *snakeString {
+func (t *snakeString) AddSlice(dts []interface{}) *snakeString {
 	for _, v := range dts {
 		t.Add(v)
 	}
@@ -356,13 +356,9 @@ func (t *snakeString) MD5() string {
 }
 
 // 根据length循环复制字符串儿
-func (t *snakeString) Tile(length int) string {
-	patLen := Len(t.Input)
-	if patLen == 0 || length <= 0 {
-		return t.Get()
-	}
+func (t *snakeString) Copy(length int) string {
 	str := String()
-	for i := 0; i < length; i += patLen {
+	for i := 0; i < length; i++ {
 		str.Add(t.Input)
 	}
 	return str.Get()
@@ -386,7 +382,7 @@ func (t *snakeString) DrawBox(width int) *snakeString {
 
 	//top
 	res.Add(chars.TopLeft).
-		Add(String(chars.Top).Tile(topInsideWidth)).
+		Add(String(chars.Top).Copy(topInsideWidth)).
 		Add(chars.TopRight).Ln()
 
 	//middle
@@ -396,7 +392,7 @@ func (t *snakeString) DrawBox(width int) *snakeString {
 
 	//bottom
 	res.Add(chars.BottomLeft).
-		Add(String(chars.Bottom).Tile(bottomInsideWidth)).
+		Add(String(chars.Bottom).Copy(bottomInsideWidth)).
 		Add(chars.BottomRight)
 
 	t.Input = res.Get()
