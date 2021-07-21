@@ -18,7 +18,7 @@ import (
 	"golang.org/x/text/width"
 )
 
-type snakeString struct {
+type SnakeString struct {
 	Input string
 }
 
@@ -26,8 +26,8 @@ type snakeString struct {
 // 输入 :
 
 // Text 初始化...
-func String(str ...interface{}) *snakeString {
-	t := &snakeString{}
+func String(str ...interface{}) *SnakeString {
+	t := &SnakeString{}
 	if len(str) > 0 {
 		t.Add(str...)
 	}
@@ -35,7 +35,7 @@ func String(str ...interface{}) *snakeString {
 }
 
 // Add 在字符串中追加文字...
-func (t *snakeString) Add(str ...interface{}) *snakeString {
+func (t *SnakeString) Add(str ...interface{}) *SnakeString {
 	b := bytes.NewBufferString(t.Input)
 	if len(str) > 0 {
 		for _, v := range str {
@@ -47,7 +47,7 @@ func (t *snakeString) Add(str ...interface{}) *snakeString {
 }
 
 // AddSlice 通过Slice在字符串中追加文字...
-func (t *snakeString) AddSlice(dts []interface{}) *snakeString {
+func (t *SnakeString) AddSlice(dts []interface{}) *SnakeString {
 	for _, v := range dts {
 		t.Add(v)
 	}
@@ -55,7 +55,7 @@ func (t *snakeString) AddSlice(dts []interface{}) *snakeString {
 }
 
 // LN 回车...
-func (t *snakeString) Ln(line ...int) *snakeString {
+func (t *SnakeString) Ln(line ...int) *SnakeString {
 	if len(line) > 0 {
 		for i := 0; i < line[0]; i++ {
 			t.Add("\n")
@@ -76,7 +76,7 @@ func (t *snakeString) Ln(line ...int) *snakeString {
 // out: http://www.dedecms.com
 // 如需替换$等字符，请使用\\$
 // snake.Text("http://$1example.com").Replace("\\$1.*(.com)", "www.dedecms${1}")
-func (t *snakeString) Replace(src, dst string, noreg ...bool) *snakeString {
+func (t *SnakeString) Replace(src, dst string, noreg ...bool) *SnakeString {
 	if len(noreg) > 0 && noreg[0] {
 		t.Input = strings.Replace(t.Input, src, dst, -1)
 		return t
@@ -86,7 +86,7 @@ func (t *snakeString) Replace(src, dst string, noreg ...bool) *snakeString {
 }
 
 // Find 判断字符串或符合正则规则的字符串是否存在 ...
-func (t *snakeString) Find(dst string, noreg ...bool) bool {
+func (t *SnakeString) Find(dst string, noreg ...bool) bool {
 
 	if len(noreg) > 0 && noreg[0] {
 		return strings.Contains(t.Input, dst)
@@ -99,7 +99,7 @@ func (t *snakeString) Find(dst string, noreg ...bool) bool {
 }
 
 // Remove 根据正则规则删除字符串 ...
-func (t *snakeString) Remove(dst ...string) *snakeString {
+func (t *SnakeString) Remove(dst ...string) *SnakeString {
 	if len(dst) > 0 {
 		for _, v := range dst {
 			t.Input = regexp.MustCompile(v).ReplaceAllString(t.Input, "")
@@ -110,7 +110,7 @@ func (t *snakeString) Remove(dst ...string) *snakeString {
 }
 
 // Keep 根据正则规则保留字符串 ...
-func (t *snakeString) Keep(dst string) *snakeString {
+func (t *SnakeString) Keep(dst string) *SnakeString {
 
 	if t.Find(dst) {
 		p := String()
@@ -127,7 +127,7 @@ func (t *snakeString) Keep(dst string) *snakeString {
 }
 
 // Extract 根据正则规则提取字符数组 ...
-func (t *snakeString) Extract(dst string, out ...string) []string {
+func (t *SnakeString) Extract(dst string, out ...string) []string {
 	arr := []string{}
 	if t.Find(dst) {
 		d := regexp.MustCompile(dst).FindAll([]byte(t.Get()), -1)
@@ -148,19 +148,19 @@ func (t *snakeString) Extract(dst string, out ...string) []string {
 }
 
 // Narrow 全角字符转半角字符 ...
-func (t *snakeString) Narrow() *snakeString {
+func (t *SnakeString) Narrow() *SnakeString {
 	t.Input = width.Narrow.String(t.Input)
 	return t
 }
 
 // Widen 半角字符转全角字符 ...
-func (t *snakeString) Widen() *snakeString {
+func (t *SnakeString) Widen() *SnakeString {
 	t.Input = width.Narrow.String(t.Input)
 	return t
 }
 
 // ReComment 去除代码注解...
-func (t *snakeString) ReComment() *snakeString {
+func (t *SnakeString) ReComment() *SnakeString {
 	t.Remove(
 		`\/\/.*`,
 		`\/\*(\s|.)*?\*\/`,
@@ -169,37 +169,37 @@ func (t *snakeString) ReComment() *snakeString {
 }
 
 // Trim 去除开始及结束出现的字符 ...
-func (t *snakeString) Trim(sep string) *snakeString {
+func (t *SnakeString) Trim(sep string) *SnakeString {
 	t.Input = strings.Trim(t.Input, sep)
 	return t
 }
 
 // ToLower 字符串全部小写 ...
-func (t *snakeString) ToLower() *snakeString {
+func (t *SnakeString) ToLower() *SnakeString {
 	t.Input = strings.ToLower(t.Input)
 	return t
 }
 
 // ToUpper 字符串全部小写 ...
-func (t *snakeString) ToUpper() *snakeString {
+func (t *SnakeString) ToUpper() *SnakeString {
 	t.Input = strings.ToUpper(t.Input)
 	return t
 }
 
 // UCFirst 字符串首字母大写 ...
-func (t *snakeString) UcFirst() *snakeString {
+func (t *SnakeString) UcFirst() *SnakeString {
 	t.Input = ucfirst(t.Input)
 	return t
 }
 
 // LCFirst 字符串首字母小写 ...
-func (t *snakeString) LcFirst() *snakeString {
+func (t *SnakeString) LcFirst() *SnakeString {
 	t.Input = lcfirst(t.Input)
 	return t
 }
 
 // Between 截取区间内容 ...
-func (t *snakeString) Between(start, end string) *snakeString {
+func (t *SnakeString) Between(start, end string) *SnakeString {
 	if (start == "" && end == "") || t.Input == "" {
 		return t
 	}
@@ -225,7 +225,7 @@ func (t *snakeString) Between(start, end string) *snakeString {
 
 // EnBase Text to Base-x:  2 < base > 36 ...
 // 将Text转为2～36进制编码
-func (t *snakeString) EnBase(base int) *snakeString {
+func (t *SnakeString) EnBase(base int) *SnakeString {
 	var r []string
 	for _, i := range t.Input {
 		r = append(r, strconv.FormatInt(int64(i), base))
@@ -236,7 +236,7 @@ func (t *snakeString) EnBase(base int) *snakeString {
 
 // DeBase Text Base-x to Text:  2 < base > 36 ...
 // 将2～36进制解码为Text
-func (t *snakeString) DeBase(base int) *snakeString {
+func (t *SnakeString) DeBase(base int) *SnakeString {
 	var r []rune
 	for _, i := range t.Split(" ") {
 		i64, err := strconv.ParseInt(i, base, 10)
@@ -253,7 +253,7 @@ func (t *snakeString) DeBase(base int) *snakeString {
 // 分词 :
 
 // CamelCase 驼峰分词: HelloWord ...
-func (t *snakeString) CamelCase() *snakeString {
+func (t *SnakeString) CamelCase() *SnakeString {
 	caseWords := t.caseWords(true)
 	for i, word := range caseWords {
 		caseWords[i] = ucfirst(word)
@@ -263,14 +263,14 @@ func (t *snakeString) CamelCase() *snakeString {
 }
 
 // SnakeCase 贪吃蛇分词: hello_word ...
-func (t *snakeString) SnakeCase() *snakeString {
+func (t *SnakeString) SnakeCase() *SnakeString {
 	caseWords := t.caseWords(false)
 	t.Input = strings.Join(caseWords, "_")
 	return t
 }
 
 // KebabCase "烤串儿"分词: hello-word ...
-func (t *snakeString) KebabCase() *snakeString {
+func (t *SnakeString) KebabCase() *SnakeString {
 	caseWords := t.caseWords(false)
 	t.Input = strings.Join(caseWords, "-")
 	return t
@@ -280,30 +280,30 @@ func (t *snakeString) KebabCase() *snakeString {
 // 输出 :
 
 // Get 获取文本...
-func (t *snakeString) Get() string {
+func (t *SnakeString) Get() string {
 	return t.Input
 }
 
 // 以LF格式输出...
-func (t *snakeString) LF() string {
+func (t *SnakeString) LF() string {
 	return t.Replace("\r\n", "\n", true).Get()
 }
 
 // Byte Function
 // 获取字符串的Byte ...
-func (t *snakeString) Byte() []byte {
+func (t *SnakeString) Byte() []byte {
 	return []byte(t.Input)
 }
 
 // Split 根据字符串进行文本分割 ...
-func (t *snakeString) Split(sep string) []string {
+func (t *SnakeString) Split(sep string) []string {
 	return strings.Split(t.Input, sep)
 }
 
 // SplitPlace 根据字符串的位置进行分割
 // Text("abcdefg").SpltPlace([]int{1,3,4})
 // Out: []string{"a", "bc", "d", "efg"}
-func (t *snakeString) SplitPlace(sep []int) []string {
+func (t *SnakeString) SplitPlace(sep []int) []string {
 	var a []string
 	b := String()
 	for k, v := range []rune(t.Input) {
@@ -325,7 +325,7 @@ func (t *snakeString) SplitPlace(sep []int) []string {
 // SplitInt 根据设置对字符串等分
 // Text("abcdefg").SpltPlace([]int{1,3,4})
 // Out: []string{"a", "bc", "d", "efg"}
-func (t *snakeString) SplitInt(sep int) []string {
+func (t *SnakeString) SplitInt(sep int) []string {
 	var a []string
 	b := String()
 	i := 0
@@ -346,17 +346,17 @@ func (t *snakeString) SplitInt(sep int) []string {
 }
 
 // Lines 根据行进行分割字符 ...
-func (t *snakeString) Lines() []string {
+func (t *SnakeString) Lines() []string {
 	return strings.Split(strings.TrimSuffix(t.Input, "\n"), "\n")
 }
 
 // MD5 获取文件的MD5
-func (t *snakeString) MD5() string {
+func (t *SnakeString) MD5() string {
 	return fmt.Sprintf("%x", md5.Sum([]byte(t.Get())))
 }
 
 // 根据length循环复制字符串儿
-func (t *snakeString) Copy(length int) string {
+func (t *SnakeString) Copy(length int) string {
 	str := String()
 	for i := 0; i < length; i++ {
 		str.Add(t.Input)
@@ -365,7 +365,7 @@ func (t *snakeString) Copy(length int) string {
 }
 
 // 根据文字自动绘制代码提示框.
-func (t *snakeString) DrawBox(width int) *snakeString {
+func (t *SnakeString) DrawBox(width int) *SnakeString {
 
 	res := String()
 	chars := pkg.DefaultBox9Slice()
@@ -400,7 +400,7 @@ func (t *snakeString) DrawBox(width int) *snakeString {
 	return t
 }
 
-func (t *snakeString) Unescape() string {
+func (t *SnakeString) Unescape() string {
 	if html, err := url.QueryUnescape(String(t.Get()).Replace(`%u(.{4})`, "/u$1/").Get()); err == nil {
 		temp := String(html)
 		for _, v := range t.Extract(`/u(.{4})?/`) {
@@ -418,7 +418,7 @@ func (t *snakeString) Unescape() string {
 
 // Charset Function
 // 返回当前进程的字符集 ...
-func (t *snakeString) Charset() (string, bool) {
+func (t *SnakeString) Charset() (string, bool) {
 
 	// 自动获取编码 ...
 	encoding, err := charsetutil.GuessBytes(t.Byte())
@@ -450,7 +450,7 @@ func (t *snakeString) Charset() (string, bool) {
 
 // ExistHan Function
 // 判断是否存在中文 ...
-func (t *snakeString) ExistHan() bool {
+func (t *SnakeString) ExistHan() bool {
 	hanLen := len(regexp.MustCompile(`[\P{Han}]`).ReplaceAllString(t.Input, ""))
 	for _, r := range t.Input {
 		if unicode.Is(unicode.Scripts["Han"], r) || hanLen > 0 {
@@ -462,7 +462,7 @@ func (t *snakeString) ExistHan() bool {
 
 // ExistGBK Function
 // 判断是否为GBK ...
-func (t *snakeString) IsGBK() bool {
+func (t *SnakeString) IsGBK() bool {
 	arr := t.Byte()
 	var i int = 0
 	for i < len(t.Byte()) {
@@ -486,7 +486,7 @@ func (t *snakeString) IsGBK() bool {
 }
 
 // 判断是否为UTF8
-func (t *snakeString) IsUTF8() bool {
+func (t *SnakeString) IsUTF8() bool {
 	data := t.Byte()
 	for i := 0; i < len(data); {
 		if data[i]&0x80 == 0x00 {
@@ -509,7 +509,7 @@ func (t *snakeString) IsUTF8() bool {
 
 // ToUTF8 Function
 // 运行对当前进程进行编码转换成UTF-8 ...
-func (t *snakeString) ToUTF8() (string, bool) {
+func (t *SnakeString) ToUTF8() (string, bool) {
 
 	// 自动获取资源编码 ...
 	charset, ok := t.Charset()
@@ -537,7 +537,7 @@ func (t *snakeString) ToUTF8() (string, bool) {
 }
 
 // LCFirst 字符串首字母小写 ...
-func (t *snakeString) Write(dst string, add ...bool) bool {
+func (t *SnakeString) Write(dst string, add ...bool) bool {
 	return FS(dst).Write(t.Get(), add...)
 }
 
@@ -545,7 +545,7 @@ func (t *snakeString) Write(dst string, add ...bool) bool {
 // 辅助函数 :
 
 // 根据规则字符进行分词 ...
-func (t *snakeString) caseWords(isCamel bool, rule ...string) []string {
+func (t *SnakeString) caseWords(isCamel bool, rule ...string) []string {
 	src := t.Input
 	if !isCamel {
 		re := regexp.MustCompile("([a-z])([A-Z])")
