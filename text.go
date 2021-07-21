@@ -3,7 +3,6 @@ package snake
 import (
 	"bytes"
 	"crypto/md5"
-	"errors"
 	"fmt"
 	"html"
 	"io/ioutil"
@@ -356,64 +355,53 @@ func (t *snakeString) MD5() string {
 	return fmt.Sprintf("%x", md5.Sum([]byte(t.Get())))
 }
 
-// DrawCustomBox creates a frame with "content" in it. Characters in the frame is specified by "chars".
-// "align" sets the alignment of the content. It must be one of the strutil.AlignType constants.
-// There are 2 premade Box9Slice objects that can be retrieved by strutil.DefaultBox9Slice() or
-// strutil.SimpleBox9Slice()
-//
-// Usage:
-//   DrawCustomBox("Hello World", 20, Center, SimpleBox9Slice(), "\n")
-//
-// Outputs:
-//   +------------------+
-//   |   Hello World    |
-//   +------------------+
-func (t *snakeString) DrawCustomBox(width int, chars pkg.Box9Slice, strNewLine string) (string, error) {
-	// nl := []byte("\n")
-	// if strNewLine != "" {
-	// 	nl = []byte(strNewLine)
-	// }
+// 根据length循环复制字符串儿
+func (t *snakeString) Tile(length int) string {
+	patLen := Len(t.Input)
+	if patLen == 0 || length <= 0 {
+		return t.Get()
+	}
+	str := String()
+	for i := 0; i < length; i += patLen {
+		str.Add(t.Input)
+	}
+	return str.Get()
+}
+
+// 根据文字自动绘制代码提示框.
+func (t *snakeString) DrawBox(width int) *snakeString {
+
+	res := String()
+	chars := pkg.DefaultBox9Slice()
 
 	var topInsideWidth = width - Len(chars.TopLeft) - Len(chars.TopRight)
-	var middleInsideWidth = width - Len(chars.Left) - Len(chars.Right)
 	var bottomInsideWidth = width - Len(chars.BottomLeft) - Len(chars.BottomRight)
-	if topInsideWidth < 1 || middleInsideWidth < 1 || bottomInsideWidth < 1 {
-		return "", errors.New("no enough width")
+
+	if topInsideWidth < 1 || bottomInsideWidth < 1 {
+		topInsideWidth = 60
+		bottomInsideWidth = 60
 	}
 
-	// content := t.Input
-	// lines := strings.Split(content, "\n")
+	lines := t.Lines()
 
-	// var buff strings.Builder
-	// minNumBytes := (width + 1) * (len(lines) + 2)
-	// buff.Grow(minNumBytes)
+	//top
+	res.Add(chars.TopLeft).
+		Add(String(chars.Top).Tile(topInsideWidth)).
+		Add(chars.TopRight).Ln()
 
-	// //top
-	// buff.WriteString(chars.TopLeft)
-	// buff.WriteString(Tile(chars.Top, topInsideWidth))
-	// buff.WriteString(chars.TopRight)
-	// buff.Write(nl)
+	//middle
+	for _, line := range lines {
+		res.Add(chars.Left).Add(" ").Add(String(line).Trim(" ").Get()).Ln()
+	}
 
-	// //middle
-	// left := []byte(chars.Left)
-	// right := []byte(chars.Right)
-	// for _, line := range lines {
-	// 	if line == "" {
-	// 		line = strings.Repeat(" ", middleInsideWidth)
-	// 	}
+	//bottom
+	res.Add(chars.BottomLeft).
+		Add(String(chars.Bottom).Tile(bottomInsideWidth)).
+		Add(chars.BottomRight)
 
-	// 	buff.Write(left)
-	// 	buff.WriteString(line)
-	// 	buff.Write(right)
-	// 	buff.Write(nl)
-	// }
+	t.Input = res.Get()
 
-	// //bottom
-	// buff.WriteString(chars.BottomLeft)
-	// buff.WriteString(Tile(chars.Bottom, bottomInsideWidth))
-	// buff.WriteString(chars.BottomRight)
-
-	return "buff.String()", nil
+	return t
 }
 
 func (t *snakeString) Unescape() string {
