@@ -26,7 +26,7 @@ type snakeString struct {
 // 输入 :
 
 // Text 初始化...
-func String(str ...string) *snakeString {
+func String(str ...interface{}) *snakeString {
 	t := &snakeString{}
 	if len(str) > 0 {
 		t.Add(str...)
@@ -35,11 +35,11 @@ func String(str ...string) *snakeString {
 }
 
 // Add 在字符串中追加文字...
-func (t *snakeString) Add(str ...string) *snakeString {
+func (t *snakeString) Add(str ...interface{}) *snakeString {
 	b := bytes.NewBufferString(t.Input)
 	if len(str) > 0 {
 		for _, v := range str {
-			b.WriteString(v)
+			b.WriteString(fmt.Sprint(v))
 		}
 	}
 	t.Input = b.String()
