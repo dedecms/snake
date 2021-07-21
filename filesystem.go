@@ -142,7 +142,7 @@ func (sk *snakeFileSystem) Ext() string {
 
 // MimeTypes 根据文件名获取MimeTypes
 func (sk *snakeFileSystem) MimeTypes() string {
-	return mimeTypes[Text(sk.Ext()).Trim(".").ToLower().Get()]
+	return mimeTypes[String(sk.Ext()).Trim(".").ToLower().Get()]
 }
 
 // MD5 获取文件的MD5
@@ -291,7 +291,7 @@ func (sk *snakeFileSystem) Config(conf interface{}) error {
 
 func (sk *snakeFileSystem) Unzip() (string, error) {
 
-	base := FS(sk.Dir()).Add(Text(sk.Base()).Remove(sk.Ext()).Get())
+	base := FS(sk.Dir()).Add(String(sk.Base()).Remove(sk.Ext()).Get())
 
 	z, err := zip.OpenReader(sk.Path)
 

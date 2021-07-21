@@ -6,10 +6,13 @@ import (
 	"os"
 	"path/filepath"
 	"unicode"
+	"unicode/utf8"
 
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/ianaindex"
 )
+
+var Len = utf8.RuneCountInString
 
 // ucfirst 英文首字母大写 ...
 func ucfirst(src string) string {
