@@ -14,22 +14,23 @@ import (
 
 // FileSystem ...
 type FileSystem interface {
-	Add(str ...string) FileSystem             // 新增路径
-	Dir() string                              // 返回目录路径
-	Base() string                             // 返回路径中最后一个元素
-	IsDir(dst ...string) bool                 // 判断是否为目录
-	IsFile(dst ...string) bool                // 判断是否为文件
-	Ls(opt ...string) []string                // 查看文件夹列表
-	Find(opt ...string) []string              // 查找文件
-	MkDir(dst ...string) bool                 // 新建文件夹
-	MkFile(dst ...string) (FileOperate, bool) // 新建文件
-	Write(src string, add ...bool) bool       // 写入文件
-	Open() (FileOperate, bool)                // 打开文件
-	Exist(dst ...string) bool                 // 判断目录或文件是否存在
-	Rm(dst ...string) bool                    // 删除目录或文件
-	Rn(newname string) bool                   // 修改目录或文件名
-	Mv(newpath string) bool                   // 移动目录或文件到指定位置
-	Cp(dir string, overwrite bool) bool       // 拷贝目录或文件到指定位置
+	Add(str ...string) FileSystem                     // 新增路径
+	Dir() string                                      // 返回目录路径
+	Base() string                                     // 返回路径中最后一个元素
+	IsDir(dst ...string) bool                         // 判断是否为目录
+	IsFile(dst ...string) bool                        // 判断是否为文件
+	Ls(opt ...string) []string                        // 查看文件夹列表
+	Find(opt ...string) []string                      // 查找文件
+	MkDir(dst ...string) bool                         // 新建文件夹
+	MkFile(dst ...string) (FileOperate, bool)         // 新建文件
+	Write(src string, add ...bool) bool               // 写入文件
+	ByteWriter(src []byte, add ...bool) (bool, error) // 通过Byte数组写入文件
+	Open() (FileOperate, bool)                        // 打开文件
+	Exist(dst ...string) bool                         // 判断目录或文件是否存在
+	Rm(dst ...string) bool                            // 删除目录或文件
+	Rn(newname string) bool                           // 修改目录或文件名
+	Mv(newpath string) bool                           // 移动目录或文件到指定位置
+	Cp(dir string, overwrite bool) bool               // 拷贝目录或文件到指定位置
 	// SameFile()                      // 文件对比
 	// Chmod()                         // 设置权限
 	// Chown()                         // 设置用户、用户组
@@ -184,6 +185,14 @@ func (sk *snakeFileSystem) MkFile(dst ...string) (FileOperate, bool) {
 
 // Write 写入文件, Add为是否追加写入，默认为覆盖写入
 func (sk *snakeFileSystem) Write(src string, add ...bool) bool {
+	if ok, err := sk.ByteWriter([]byte(src), add...); ok && err == nil {
+		return true
+	}
+	return false
+}
+
+// WriteByte 通过byte数组写入文件, Add为是否追加写入，默认为覆盖写入
+func (sk *snakeFileSystem) ByteWriter(src []byte, add ...bool) (bool, error) {
 	var f *os.File
 	var err error
 
@@ -202,14 +211,14 @@ func (sk *snakeFileSystem) Write(src string, add ...bool) bool {
 	}
 
 	if err == nil {
-		_, err = f.Write([]byte(src))
+		_, err = f.Write(src)
 	}
 
 	if err == nil {
-		return true
+		return true, nil
 	}
 
-	return false
+	return false, err
 }
 
 // Exist 判断文件或目录是否存在
