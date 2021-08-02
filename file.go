@@ -48,3 +48,13 @@ func (sk *snakefile) String() *SnakeString {
 
 	return String(buf.String())
 }
+
+// Text 获取文本 []byte ...
+func (sk *snakefile) Byte() []byte {
+	var buf bytes.Buffer
+	_, err := buf.ReadFrom(sk.Input)
+	if err != nil {
+		return nil
+	}
+	return buf.Bytes()
+}
