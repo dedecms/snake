@@ -13,6 +13,7 @@ type snakefile struct {
 type FileOperate interface {
 	Get() *os.File
 	String() *SnakeString
+	Byte() []byte
 	Close() error // 关闭文件链接
 }
 
