@@ -25,7 +25,7 @@ type FileSystem interface {
 	MkFile(dst ...string) (FileOperate, bool)         // 新建文件
 	Write(src string, add ...bool) bool               // 写入文件
 	ByteWriter(src []byte, add ...bool) (bool, error) // 通过Byte数组写入文件
-	Open() (FileOperate, bool)                        // 打开文件
+	Open(add ...bool) (FileOperate, bool)             // 打开文件
 	Exist(dst ...string) bool                         // 判断目录或文件是否存在
 	Rm(dst ...string) bool                            // 删除目录或文件
 	Rn(newname string) bool                           // 修改目录或文件名
@@ -113,7 +113,11 @@ func (sk *snakeFileSystem) Rm(dst ...string) bool {
 }
 
 // Open 打开文件
-func (sk *snakeFileSystem) Open() (FileOperate, bool) {
+func (sk *snakeFileSystem) Open(add ...bool) (FileOperate, bool) {
+	if len(add) > 0 && add[0] {
+		file, err := os.OpenFile(sk.Path, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
+		return File(file), err == nil
+	}
 	file, err := os.Open(sk.Path)
 	return File(file), err == nil
 }
