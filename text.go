@@ -85,6 +85,12 @@ func (t *SnakeString) Replace(src, dst string, noreg ...bool) *SnakeString {
 	return t
 }
 
+// ReplaceOne 替换出现的第一个字符串 ...
+func (t *SnakeString) ReplaceOne(src, dst string) *SnakeString {
+	t.Input = strings.Replace(t.Input, src, dst, 1)
+	return t
+}
+
 // Find 判断字符串或符合正则规则的字符串是否存在 ...
 func (t *SnakeString) Find(dst string, noreg ...bool) bool {
 
@@ -107,6 +113,18 @@ func (t *SnakeString) Remove(dst ...string) *SnakeString {
 	}
 
 	return t
+}
+
+// ExistSlice 字符串是否存在于数组中 ...
+func (t *SnakeString) ExistSlice(dst []string) bool {
+	if len(dst) > 0 {
+		for _, v := range dst {
+			if t.Get() == v {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 // Keep 根据正则规则保留字符串 ...
@@ -239,7 +257,7 @@ func (t *SnakeString) EnBase(base int) *SnakeString {
 func (t *SnakeString) DeBase(base int) *SnakeString {
 	var r []rune
 	for _, i := range t.Split(" ") {
-		i64, err := strconv.ParseInt(i, base, 10)
+		i64, err := strconv.ParseInt(i, base, 64)
 		if err != nil {
 			panic(err)
 		}
@@ -285,8 +303,8 @@ func (t *SnakeString) Get() string {
 }
 
 // 以LF格式输出...
-func (t *SnakeString) LF() string {
-	return t.Replace("\r\n", "\n", true).Get()
+func (t *SnakeString) LF() *SnakeString {
+	return t.Replace("\r\n", "\n", true)
 }
 
 // Byte Function
@@ -365,13 +383,16 @@ func (t *SnakeString) Copy(length int) string {
 }
 
 // 根据文字自动绘制代码提示框.
-func (t *SnakeString) DrawBox(width int) *SnakeString {
+func (t *SnakeString) DrawBox(width int, chars ...pkg.Box9Slice) *SnakeString {
 
 	res := String()
-	chars := pkg.DefaultBox9Slice()
+	char := pkg.DefaultBox9Slice()
+	if len(chars) == 1 {
+		char = chars[0]
+	}
 
-	var topInsideWidth = width - Len(chars.TopLeft) - Len(chars.TopRight)
-	var bottomInsideWidth = width - Len(chars.BottomLeft) - Len(chars.BottomRight)
+	var topInsideWidth = width - Len(char.TopLeft) - Len(char.TopRight)
+	var bottomInsideWidth = width - Len(char.BottomLeft) - Len(char.BottomRight)
 
 	if topInsideWidth < 1 || bottomInsideWidth < 1 {
 		topInsideWidth = 60
@@ -381,19 +402,19 @@ func (t *SnakeString) DrawBox(width int) *SnakeString {
 	lines := t.Lines()
 
 	//top
-	res.Add(chars.TopLeft).
-		Add(String(chars.Top).Copy(topInsideWidth)).
-		Add(chars.TopRight).Ln()
+	res.Add(char.TopLeft).
+		Add(String(char.Top).Copy(topInsideWidth)).
+		Add(char.TopRight).Ln()
 
 	//middle
 	for _, line := range lines {
-		res.Add(chars.Left).Add(" ").Add(String(line).Trim(" ").Get()).Ln()
+		res.Add(char.Left).Add(" ").Add(String(line).Trim(" ").Get()).Ln()
 	}
 
 	//bottom
-	res.Add(chars.BottomLeft).
-		Add(String(chars.Bottom).Copy(bottomInsideWidth)).
-		Add(chars.BottomRight)
+	res.Add(char.BottomLeft).
+		Add(String(char.Bottom).Copy(bottomInsideWidth)).
+		Add(char.BottomRight)
 
 	t.Input = res.Get()
 
