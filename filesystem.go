@@ -60,7 +60,7 @@ func FS(str ...string) FileSystem {
 func (sk *snakeFileSystem) Add(str ...string) FileSystem {
 	if len(str) > 0 {
 		for _, v := range str {
-			sk.Path = filepath.Join(sk.Path, v)
+			sk.Path = filepath.Clean(filepath.Join(sk.Path, String(v).Replace(`\`, "/", true).Get()))
 		}
 	}
 	return sk
@@ -200,8 +200,6 @@ func (sk *snakeFileSystem) ByteWriter(src []byte, add ...bool) (bool, error) {
 	var f *os.File
 	var err error
 
-	defer f.Close()
-
 	if sk.Exist() && sk.IsFile() {
 		if len(add) > 0 && add[0] {
 			f, err = os.OpenFile(sk.Path, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
@@ -217,6 +215,8 @@ func (sk *snakeFileSystem) ByteWriter(src []byte, add ...bool) (bool, error) {
 	if err == nil {
 		_, err = f.Write(src)
 	}
+
+	f.Close()
 
 	if err == nil {
 		return true, nil
@@ -294,7 +294,7 @@ func (sk *snakeFileSystem) pathdst(dst ...string) string {
 
 // Get 获取文本...
 func (sk *snakeFileSystem) Get() string {
-	return sk.Path
+	return filepath.Clean(sk.Path)
 }
 
 // Config 加载配置文件...
