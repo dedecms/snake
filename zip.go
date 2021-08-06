@@ -3,7 +3,6 @@ package snake
 import (
 	"archive/zip"
 	"bytes"
-	"io/ioutil"
 )
 
 type Ziplib struct {
@@ -31,7 +30,7 @@ func (z *Ziplib) Add(path string, body []byte) bool {
 func (z *Ziplib) Close() error {
 	err := z.FS.Close()
 	if err == nil {
-		ioutil.WriteFile(z.ZipFileName, z.Buffer.Bytes(), 0644)
+		FS(z.ZipFileName).ByteWriter(z.Buffer.Bytes())
 	}
 	return err
 }
