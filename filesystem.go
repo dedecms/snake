@@ -71,35 +71,34 @@ func (sk *snakeFileSystem) Add(str ...string) FileSystem {
 
 // Cp 拷贝目录或文件
 func (sk *snakeFileSystem) Cp(dir string, overwrite bool) bool {
-	dst := FS(dir)
+	dstroot := FS(dir)
+	dst := FS(dir).Add(sk.Base())
 
 	// todo:目标存在则返回错误
-	if dst.Add(sk.Base()).Exist() && !overwrite {
+
+	if dst.Exist() && !overwrite {
 		return false
 	}
 
 	// todo:目标与源相同
-	if dst.Add(sk.Base()).Get() == sk.Get() {
+	if dst.Get() == sk.Get() {
 		return false
 	}
 
 	if sk.IsFile() {
-		// 覆盖拷贝文件
-		// todo: 拷贝文件错误信息
-		return _owcpfile(sk, dst.Add(sk.Base()))
+		return _owcpfile(sk, dst)
 	} else if sk.IsDir() {
 		// 覆盖拷贝目录
-		if dst.Add(sk.Base()).Exist() {
+		if dst.Exist() {
 			dst.Rm()
 		}
-		for _, v := range sk.Find() {
+
+		for _, v := range sk.Find("*") {
 			src := FS(v)
 			if src.IsFile() {
-				// todo: 拷贝文件错误信息
-				_owcpfile(src, FS(dst.Get(), src.Get()))
+				_owcpfile(src, FS(dstroot.Get(), String(src.Get()).ReplaceOne(sk.Get(), "").Get()))
 			} else if sk.IsDir() {
-				// todo: 拷贝目录错误信息
-				FS(dst.Get(), src.Get()).MkDir()
+				FS(dstroot.Get(), src.Get()).MkDir()
 			}
 		}
 	}
