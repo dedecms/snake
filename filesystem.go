@@ -15,6 +15,7 @@ import (
 // FileSystem ...
 type FileSystem interface {
 	Add(str ...string) FileSystem                     // 新增路径
+	ReplaceRoot(str ...string) FileSystem             //替换根目录位置
 	Dir() string                                      // 返回目录路径
 	Base() string                                     // 返回路径中最后一个元素
 	IsDir(dst ...string) bool                         // 判断是否为目录
@@ -34,6 +35,7 @@ type FileSystem interface {
 	// SameFile()                      // 文件对比
 	// Chmod()                         // 设置权限
 	// Chown()                         // 设置用户、用户组
+
 	Ext() string // 返回文件扩展名
 	MimeTypes() string
 	MD5() string                   // 返回文件MD5
@@ -70,7 +72,7 @@ func (sk *snakeFileSystem) Add(str ...string) FileSystem {
 // 处理 :
 
 // Add 在字符串中追加文字...
-func (sk *snakeFileSystem) ReplaceFirst(str ...string) FileSystem {
+func (sk *snakeFileSystem) ReplaceRoot(str ...string) FileSystem {
 	path := filepath.SplitList(sk.Path)
 	path[0] = str[0]
 

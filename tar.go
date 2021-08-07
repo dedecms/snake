@@ -4,6 +4,7 @@ import (
 	"archive/tar"
 	"bytes"
 	"compress/gzip"
+	"io/fs"
 )
 
 type Tarlib struct {
@@ -22,14 +23,9 @@ func Tar(tarfile string) *Tarlib {
 	return t
 }
 
-func (t *Tarlib) Add(path string, body []byte, typeflag byte) bool {
-	if !String(path).Find(".DS_Store", true) && !String(path).Find("__MACOSX", true) {
-		header := &tar.Header{
-			Typeflag: typeflag,
-			Name:     path,
-			Mode:     0644,
-			Size:     int64(len(body)),
-		}
+func (t *Tarlib) Add(path string, body []byte, stat fs.FileInfo) bool {
+	if !String(path).Find(".DS_Store", true) && !String(path).Find("__MACOSX", true) && !String(path).Find(".gitignore", true) {
+		header, _ := tar.FileInfoHeader(stat, "")
 		if err := t.FS.WriteHeader(header); err == nil {
 			_, err := t.FS.Write(body)
 			return err == nil
