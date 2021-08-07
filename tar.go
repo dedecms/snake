@@ -7,10 +7,10 @@ import (
 )
 
 type Tarlib struct {
-	Buffer      *bytes.Buffer
-	FS          *tar.Writer
-	Gzip        *gzip.Writer
-	ZipFileName string
+	Buffer   *bytes.Buffer
+	FS       *tar.Writer
+	Gzip     *gzip.Writer
+	FileName string
 }
 
 func Tar(tarfile string) *Tarlib {
@@ -18,7 +18,7 @@ func Tar(tarfile string) *Tarlib {
 	t.Buffer = new(bytes.Buffer)
 	t.Gzip = gzip.NewWriter(t.Buffer)
 	t.FS = tar.NewWriter(t.Gzip)
-	t.ZipFileName = tarfile
+	t.FileName = tarfile
 	return t
 }
 
@@ -37,11 +37,9 @@ func (t *Tarlib) Add(path string, body []byte) bool {
 	return false
 }
 
-func (z *Tarlib) Close() error {
-	z.Gzip.Close()
-	err := z.FS.Close()
-	if err == nil {
-		FS(z.ZipFileName).ByteWriter(z.Buffer.Bytes())
-	}
+func (t *Tarlib) Close() error {
+	t.Gzip.Close()
+	t.FS.Close()
+	_, err := FS(t.FileName).ByteWriter(t.Buffer.Bytes())
 	return err
 }
