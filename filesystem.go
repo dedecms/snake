@@ -69,6 +69,14 @@ func (sk *snakeFileSystem) Add(str ...string) FileSystem {
 // ---------------------------------------
 // 处理 :
 
+// Add 在字符串中追加文字...
+func (sk *snakeFileSystem) ReplaceFirst(str ...string) FileSystem {
+	path := filepath.SplitList(sk.Path)
+	path[0] = str[0]
+
+	return FS(path...)
+}
+
 // Cp 拷贝目录或文件
 func (sk *snakeFileSystem) Cp(dir string, overwrite bool) bool {
 	dstroot := FS(dir)
