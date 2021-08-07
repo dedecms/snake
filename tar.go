@@ -22,12 +22,13 @@ func Tar(tarfile string) *Tarlib {
 	return t
 }
 
-func (t *Tarlib) Add(path string, body []byte) bool {
+func (t *Tarlib) Add(path string, body []byte, typeflag byte) bool {
 	if !String(path).Find(".DS_Store", true) && !String(path).Find("__MACOSX", true) {
 		header := &tar.Header{
-			Name: path,
-			Mode: 0644,
-			Size: int64(len(body)),
+			Typeflag: typeflag,
+			Name:     path,
+			Mode:     0644,
+			Size:     int64(len(body)),
 		}
 		if err := t.FS.WriteHeader(header); err == nil {
 			_, err := t.FS.Write(body)
@@ -38,8 +39,8 @@ func (t *Tarlib) Add(path string, body []byte) bool {
 }
 
 func (t *Tarlib) Close() error {
-	t.Gzip.Close()
 	t.FS.Close()
+	t.Gzip.Close()
 	_, err := FS(t.FileName).ByteWriter(t.Buffer.Bytes())
 	return err
 }
