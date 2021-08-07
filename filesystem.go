@@ -73,9 +73,8 @@ func (sk *snakeFileSystem) Add(str ...string) FileSystem {
 
 // Add 在字符串中追加文字...
 func (sk *snakeFileSystem) ReplaceRoot(str ...string) FileSystem {
-	path := filepath.SplitList(sk.Path)
+	path := String(sk.Path).Split("/")
 	path[0] = str[0]
-
 	return FS(path...)
 }
 

@@ -24,8 +24,9 @@ func Tar(tarfile string) *Tarlib {
 }
 
 func (t *Tarlib) Add(path string, stat fs.FileInfo, body []byte) bool {
-	if !String(path).Find(".DS_Store", true) && !String(path).Find("__MACOSX", true) && !String(path).Find(".gitignore", true) {
+	if !String(path).Find(".DS_Store", true) && !String(path).Find("__MACOSX", true) && !String(path).Find(".gitignore", true) && !String(path).Find(".index", true) {
 		header, _ := tar.FileInfoHeader(stat, "")
+		header.Name = path
 		if err := t.FS.WriteHeader(header); err == nil {
 			_, err := t.FS.Write(body)
 			return err == nil
