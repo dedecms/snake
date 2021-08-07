@@ -29,11 +29,9 @@ func (t *Tarlib) Add(path string, body []byte) bool {
 			Mode: 0644,
 			Size: int64(len(body)),
 		}
-		if err := t.FS.WriteHeader(header); err != nil {
-			return false
-		}
-		if _, err := t.FS.Write(body); err == nil {
-			return true
+		if err := t.FS.WriteHeader(header); err == nil {
+			_, err := t.FS.Write(body)
+			return err == nil
 		}
 	}
 	return false
