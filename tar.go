@@ -16,8 +16,8 @@ type Tarlib struct {
 func Tar(tarfile string) *Tarlib {
 	t := new(Tarlib)
 	t.Buffer = new(bytes.Buffer)
-	t.Gzip, _ = gzip.NewWriterLevel(t.Buffer, gzip.BestCompression)
-	t.FS = tar.NewWriter(t.Buffer)
+	t.Gzip = gzip.NewWriter(t.Buffer)
+	t.FS = tar.NewWriter(t.Gzip)
 	t.ZipFileName = tarfile
 	return t
 }
