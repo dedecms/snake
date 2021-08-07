@@ -302,6 +302,14 @@ func (t *SnakeString) Get() string {
 	return t.Input
 }
 
+// Get 获取文本...
+func (t *SnakeString) GetOneLine() string {
+	for _, v := range t.Lines() {
+		return v
+	}
+	return t.Input
+}
+
 // 以LF格式输出...
 func (t *SnakeString) LF() *SnakeString {
 	return t.Replace("\r\n", "\n", true)
@@ -363,7 +371,7 @@ func (t *SnakeString) SplitInt(sep int) []string {
 	return a
 }
 
-// Lines 根据行进行分割字符 ...
+// ss 根据行进行分割字符 ...
 func (t *SnakeString) Lines() []string {
 	return strings.Split(strings.TrimSuffix(t.Input, "\n"), "\n")
 }
