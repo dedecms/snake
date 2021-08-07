@@ -20,11 +20,13 @@ func Zip(zipfile string) *Ziplib {
 }
 
 func (z *Ziplib) Add(path string, body []byte) bool {
-	if file, err := z.FS.Create(path); err == nil {
-		_, err := file.Write(body)
-		return err == nil
+	if !String(path).Find(".DS_Store", true) && !String(path).Find("__MACOSX", true) {
+		if file, err := z.FS.Create(path); err == nil {
+			_, err := file.Write(body)
+			return err == nil
+		}
 	}
-	return true
+	return false
 }
 
 func (z *Ziplib) Close() error {
