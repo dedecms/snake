@@ -23,19 +23,19 @@ func Tar(tarfile string) *Tarlib {
 }
 
 func (t *Tarlib) Add(path string, body []byte) bool {
-
-	header := &tar.Header{
-		Name: path,
-		Mode: 0644,
-		Size: int64(len(body)),
+	if !String(path).Find(".DS_Store", true) && !String(path).Find("__MACOSX", true) {
+		header := &tar.Header{
+			Name: path,
+			Mode: 0644,
+			Size: int64(len(body)),
+		}
+		if err := t.FS.WriteHeader(header); err != nil {
+			return false
+		}
+		if _, err := t.FS.Write(body); err == nil {
+			return true
+		}
 	}
-	if err := t.FS.WriteHeader(header); err != nil {
-		return false
-	}
-	if _, err := t.FS.Write(body); err == nil {
-		return true
-	}
-
 	return false
 }
 
