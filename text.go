@@ -302,7 +302,7 @@ func (t *SnakeString) Get() string {
 	return t.Input
 }
 
-// Get 获取文本...
+// GetOneLine 在多行字符串中获取第一行字符串...
 func (t *SnakeString) GetOneLine() string {
 	for _, v := range t.Lines() {
 		return v
