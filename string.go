@@ -150,10 +150,11 @@ func (t *SnakeString) Extract(dst string, out ...string) []string {
 	if t.Find(dst) {
 		d := regexp.MustCompile(dst).FindAll([]byte(t.Get()), -1)
 		if len(out) > 0 && out[0] != "" {
-			for _, v := range d {
-				arr = append(arr, String(string(v)).Replace(dst, out[0]).Get())
+			for _, s := range out {
+				for _, v := range d {
+					arr = append(arr, String(string(v)).Replace(dst, s).Get())
+				}
 			}
-
 			return arr
 		}
 
